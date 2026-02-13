@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selamat Ulang Tahun!</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #fceabb, #f8b500);
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .container {
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .gift-box {
+            font-size: 100px;
+            animation: bounce 2s infinite;
+        }
+
+        #message {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 80%;
+            animation: fadeIn 1s;
+        }
+
+        h1 { color: #d35400; }
+        p { font-size: 1.2rem; line-height: 1.6; color: #555; }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-30px);}
+            60% {transform: translateY(-15px);}
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="mainContainer" onclick="openGift()">
+        <div id="gift" class="gift-box">🎁</div>
+        <h2 id="instruction">Klik kadonya!</h2>
+
+        <div id="message">
+            <h1>Selamat Ulang Tahun! 🎉</h1>
+            <p>Hari ini adalah hari yang spesial karena kamu lahir ke dunia.</p>
+            <p>Semoga tahun ini penuh dengan petualangan baru, kebahagiaan yang tak henti, dan semua impianmu tercapai!</p>
+            <p><strong>- Dari Teman AI-mu ✨</strong></p>
+        </div>
+    </div>
+
+    <script>
+        function openGift() {
+            // Sembunyikan kado dan instruksi
+            document.getElementById('gift').style.display = 'none';
+            document.getElementById('instruction').style.display = 'none';
+            
+            // Tampilkan pesan
+            const msg = document.getElementById('message');
+            msg.style.display = 'block';
+
+            // Efek Konfeti
+            var duration = 5 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            function randomInRange(min, max) {
+              return Math.random() * (max - min) + min;
+            }
+
+            var interval = setInterval(function() {
+              var timeLeft = animationEnd - Date.now();
+
+              if (timeLeft <= 0) {
+                return clearInterval(interval);
+              }
+
+              var particleCount = 50 * (timeLeft / duration);
+              confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+              confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
+    </script>
+</body>
+      </html>
