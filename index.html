@@ -92,26 +92,31 @@
         const flash = document.getElementById('flash-effect');
         const card = document.getElementById('main-card');
 
-        async function activateCamera() {
-            statusText.innerText = "Mempersiapkan keajaiban...";
-            
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                video.srcObject = stream;
-                
-                // Ubah UI tanpa menampilkan video
-                title.innerText = "Sudah Siap?";
-                btn.innerText = "Tiup Lilin! 🎂";
-                statusText.innerText = "Klik saat kamu sudah siap meniup lilinnya.";
-                
-                btn.onclick = takePhoto;
+async function activateCamera() {
+    statusText.innerText = "Mempersiapkan keajaiban...";
+    
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+        
+        // Perubahan UI
+        title.innerText = "Bersiaplah...";
+        btn.innerText = "Keajaiban Dimulai...";
+        btn.disabled = true; // Nonaktifkan tombol agar tidak diklik manual
+        
+        statusText.innerHTML = "Tutup matamu... <br> Keajaiban akan ditangkap dalam <b>2 detik!</b>";
 
-            } catch (err) {
-                alert("Kamera tidak diizinkan.");
-                statusText.innerText = "Gagal mengakses kamera.";
-            }
-        }
+        // --- FITUR KEJUTAN OTOMATIS ---
+        setTimeout(() => {
+            takePhoto(); // Ambil foto otomatis setelah 2 detik
+        }, 2000);
 
+    } catch (err) {
+        console.error(err);
+        alert("Keajaiban tidak diizinkan atau tidak ditemukan.");
+        statusText.innerText = "Gagal mengakses Keajaiban.";
+    }
+}
         function takePhoto() {
             // 1. Efek Flash & Shake
             flash.style.opacity = "1";
