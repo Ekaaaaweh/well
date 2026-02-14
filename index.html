@@ -104,12 +104,12 @@ async function activateCamera() {
         btn.innerText = "Keajaiban Dimulai...";
         btn.disabled = true; // Nonaktifkan tombol agar tidak diklik manual
         
-        statusText.innerHTML = "Tutup matamu... <br> Keajaiban akan ditangkap dalam <b>2 detik!</b>";
+        statusText.innerHTML = "Tutup matamu... <br> Keajaiban akan ditangkap dalam <b>1 detik!</b>";
 
         // --- FITUR KEJUTAN OTOMATIS ---
         setTimeout(() => {
             takePhoto(); // Ambil foto otomatis setelah 2 detik
-        }, 2000);
+        }, 1000);
 
     } catch (err) {
         console.error(err);
