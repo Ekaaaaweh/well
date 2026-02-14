@@ -3,177 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Special Day For You ✨</title>
+    <title>Birthday Surprise! 📸</title>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
         :root {
-            --primary: #ff758c;
-            --secondary: #ff7eb3;
-            --text: #2d3436;
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
         }
 
         body {
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
+            background: linear-gradient(45deg, #6c5ce7, #a29bfe);
+            height: 100vh; display: flex; justify-content: center; align-items: center;
+            overflow: hidden; color: white;
         }
 
         /* Overlay Awal */
         #welcome-screen {
-            position: fixed;
-            inset: 0;
-            background: white;
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: transform 1s cubic-bezier(0.77, 0, 0.175, 1);
+            position: fixed; inset: 0; background: #fff; z-index: 100;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: 1s cubic-bezier(0.7, 0, 0.3, 1);
         }
 
-        /* Card Utama */
         .card {
-            background: rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 40px;
-            border-radius: 30px;
-            width: 85%;
-            max-width: 450px;
-            text-align: center;
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
-            transform: translateY(50px);
-            opacity: 0;
-            transition: 1s all ease-out;
+            padding: 30px; border-radius: 30px;
+            width: 85%; max-width: 400px; text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: none; transform: scale(0.8); transition: 0.5s;
         }
 
-        .card.show {
-            transform: translateY(0);
-            opacity: 1;
+        .card.active { display: block; transform: scale(1); }
+
+        h1 { font-family: 'Dancing Script', cursive; font-size: 2.5rem; margin: 10px 0; }
+
+        /* Style Kamera */
+        #camera-container {
+            width: 100%; height: 250px; border-radius: 20px;
+            overflow: hidden; background: #000; margin: 15px 0;
+            display: none; border: 4px solid white; position: relative;
         }
 
-        .profile-img {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: 5px solid white;
-            margin-bottom: 20px;
-            object-fit: cover;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        video { width: 100%; height: 100%; object-fit: cover; }
+        
+        canvas { display: none; } /* Untuk memproses gambar */
+
+        .btn {
+            background: white; color: var(--primary); border: none;
+            padding: 12px 30px; border-radius: 50px; font-weight: 600;
+            cursor: pointer; transition: 0.3s; margin-top: 10px;
         }
 
-        h1 {
-            font-family: 'Dancing Script', cursive;
-            font-size: 3rem;
-            margin: 0;
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-        }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
 
-        p {
-            color: white;
-            font-size: 1.1rem;
-            line-height: 1.6;
-            margin: 20px 0;
-        }
-
-        .btn-main {
-            background: white;
-            color: var(--primary);
-            border: none;
-            padding: 15px 40px;
-            border-radius: 50px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transition: 0.3s;
-        }
-
-        .btn-main:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-        }
-
-        /* Float Animasi */
-        .floating {
-            animation: floating 3s ease-in-out infinite;
-        }
-
-        @keyframes floating {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-15px); }
-            100% { transform: translateY(0px); }
-        }
-
-        #cake { font-size: 50px; margin: 10px 0; }
+        #final-msg { font-size: 0.9rem; font-style: italic; margin-top: 10px; display: none; }
     </style>
 </head>
 <body>
 
     <div id="welcome-screen">
-        <h2 style="color: var(--primary); margin-bottom: 20px;">Halo Kamu! ✨</h2>
-        <button class="btn-main" onclick="openGift()" style="background: var(--primary); color: white;">Buka Sesuatu</button>
+        <h1 style="color: var(--primary);">Ada Hadiah Untukmu... 🎁</h1>
+        <button class="btn" onclick="openGift()" style="background: var(--primary); color: white;">Klik untuk Buka</button>
     </div>
 
     <div class="card" id="mainCard">
-        <div class="floating">
-            
-        </div>
-        <div id="cake">🎂</div>
+        <div id="cake" style="font-size: 50px;">🎂</div>
         <h1>Happy Birthday!</h1>
-        <p>Di hari yang spesial ini, aku cuma mau bilang terima kasih sudah menjadi orang yang luar biasa. Semoga tahun ini membawa banyak kebahagiaan untukmu!</p>
-        <button class="btn-main" onclick="makeWish()">Make a Wish! ✨</button>
+        <p id="instruction">Tekan tombol di bawah untuk melihat harapanmu di masa depan!</p>
+        
+        <div id="camera-container">
+            <video id="video" autoplay playsinline></video>
+        </div>
+
+        <button id="wishBtn" class="btn" onclick="startCamera()">Make a Wish! ✨</button>
+        <p id="final-msg">"Lihat betapa cantiknya/gantengnya dirimu hari ini. Teruslah bersinar! ✨"</p>
     </div>
 
     <script>
+        const welcome = document.getElementById('welcome-screen');
+        const card = document.getElementById('mainCard');
+        const video = document.getElementById('video');
+        const camContainer = document.getElementById('camera-container');
+        const wishBtn = document.getElementById('wishBtn');
+        const instruction = document.getElementById('instruction');
+        const finalMsg = document.getElementById('final-msg');
+
         function openGift() {
-            // Sembunyikan layar awal
-            document.getElementById('welcome-screen').style.transform = 'translateY(-100%)';
-            
-            // Tampilkan kartu utama
+            welcome.style.transform = 'translateY(-100%)';
             setTimeout(() => {
-                document.getElementById('mainCard').classList.add('show');
+                card.classList.add('active');
                 fireConfetti();
-            }, 500);
+            }, 600);
         }
 
-        function makeWish() {
-            fireConfetti();
-            alert("Semoga semua keinginanmu terkabul! 🥳✨");
+        async function startCamera() {
+            try {
+                // Request akses kamera
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                
+                // Animasi transisi ke kamera
+                instruction.innerText = "Tersenyumlah ke arah kamera... 😊";
+                camContainer.style.display = "block";
+                wishBtn.innerText = "Tiup Lilin! 🕯️";
+                
+                // Ubah fungsi tombol setelah kamera aktif
+                wishBtn.onclick = function() {
+                    fireConfetti();
+                    instruction.innerText = "Harapanmu sudah tercatat di bintang-bintang!";
+                    finalMsg.style.display = "block";
+                    wishBtn.style.display = "none";
+                };
+
+            } catch (err) {
+                alert("Ups! Berikan izin akses kamera agar kejutan bisa muncul ya! :)");
+                console.error("Error akses kamera: ", err);
+            }
         }
 
         function fireConfetti() {
-            var duration = 3 * 1000;
-            var end = Date.now() + duration;
-
-            (function frame() {
-              confetti({
-                particleCount: 3,
-                angle: 60,
-                spread: 55,
-                origin: { x: 0 },
-                colors: ['#ffffff', '#ff758c']
-              });
-              confetti({
-                particleCount: 3,
-                angle: 120,
-                spread: 55,
-                origin: { x: 1 },
-                colors: ['#ffffff', '#ff758c']
-              });
-
-              if (Date.now() < end) {
-                requestAnimationFrame(frame);
-              }
-            }());
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#ffffff', '#a29bfe', '#6c5ce7']
+            });
         }
     </script>
 </body>
