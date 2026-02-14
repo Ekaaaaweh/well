@@ -3,126 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Happy Birthday! 🎂</title>
+    <title>Special Day For You ✨</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
-        /* Gaya Dasar */
+        :root {
+            --primary: #ff758c;
+            --secondary: #ff7eb3;
+            --text: #2d3436;
+        }
+
         body {
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #ffe4e1;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
             overflow: hidden;
-            text-align: center;
         }
 
         /* Overlay Awal */
-        #overlay {
+        #welcome-screen {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #ff6b6b;
+            inset: 0;
+            background: white;
+            z-index: 100;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 10;
-            color: white;
-            transition: 0.8s;
+            transition: transform 1s cubic-bezier(0.77, 0, 0.175, 1);
         }
 
-        /* Konten Utama */
-        .container {
-            background: white;
-            padding: 2rem;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            max-width: 400px;
-            z-index: 1;
+        /* Card Utama */
+        .card {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 40px;
+            border-radius: 30px;
+            width: 85%;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+            transform: translateY(50px);
+            opacity: 0;
+            transition: 1s all ease-out;
         }
 
-        h1 { color: #ff4757; }
-        p { color: #57606f; line-height: 1.6; }
-
-        .btn {
-            background: #ff4757;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: 0.3s;
-            margin-top: 15px;
+        .card.show {
+            transform: translateY(0);
+            opacity: 1;
         }
 
-        .btn:hover { background: #ff6b81; transform: scale(1.05); }
-
-        /* Animasi Balon */
-        .balloon {
-            position: absolute;
-            bottom: -100px;
-            width: 50px;
-            height: 70px;
-            background: #ff4757;
+        .profile-img {
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
-            opacity: 0.7;
-            z-index: 0;
-            animation: float 6s infinite ease-in;
+            border: 5px solid white;
+            margin-bottom: 20px;
+            object-fit: cover;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
-        @keyframes float {
-            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(-120vh) rotate(20deg); opacity: 0; }
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3rem;
+            margin: 0;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         }
 
-        .hidden { display: none; }
+        p {
+            color: white;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin: 20px 0;
+        }
+
+        .btn-main {
+            background: white;
+            color: var(--primary);
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: 0.3s;
+        }
+
+        .btn-main:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        /* Float Animasi */
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+        #cake { font-size: 50px; margin: 10px 0; }
     </style>
 </head>
 <body>
 
-    <div id="overlay">
-        <h1>Ada Pesan Untukmu! 🎁</h1>
-        <button class="btn" onclick="startSurprise()">Buka Kado</button>
+    <div id="welcome-screen">
+        <h2 style="color: var(--primary); margin-bottom: 20px;">Halo Kamu! ✨</h2>
+        <button class="btn-main" onclick="openGift()" style="background: var(--primary); color: white;">Buka Sesuatu</button>
     </div>
 
-    <div class="container">
-        <h1 id="title">Happy Birthday! ✨</h1>
-        <p id="message">Semoga hari-harimu penuh dengan kebahagiaan, tawa, dan semua impianmu tercapai!</p>
-        <button class="btn" onclick="showSurprise()">Klik untuk Kejutan</button>
-        <p id="secret" class="hidden" style="margin-top: 20px; font-weight: bold; color: #ff4757;">
-            🎈 Kamu luar biasa! Traktirannya ditunggu ya! 🎈
-        </p>
+    <div class="card" id="mainCard">
+        <div class="floating">
+            <img src="https://via.placeholder.com/150" alt="Birthday Person" class="profile-img">
+        </div>
+        <div id="cake">🎂</div>
+        <h1>Happy Birthday!</h1>
+        <p>Di hari yang spesial ini, aku cuma mau bilang terima kasih sudah menjadi orang yang luar biasa. Semoga tahun ini membawa banyak kebahagiaan untukmu!</p>
+        <button class="btn-main" onclick="makeWish()">Make a Wish! ✨</button>
     </div>
 
     <script>
-        function startSurprise() {
-            document.getElementById('overlay').style.opacity = '0';
+        function openGift() {
+            // Sembunyikan layar awal
+            document.getElementById('welcome-screen').style.transform = 'translateY(-100%)';
+            
+            // Tampilkan kartu utama
             setTimeout(() => {
-                document.getElementById('overlay').style.display = 'none';
-                createBalloons();
-            }, 800);
+                document.getElementById('mainCard').classList.add('show');
+                fireConfetti();
+            }, 500);
         }
 
-        function showSurprise() {
-            const secret = document.getElementById('secret');
-            secret.classList.toggle('hidden');
+        function makeWish() {
+            fireConfetti();
+            alert("Semoga semua keinginanmu terkabul! 🥳✨");
         }
 
-        function createBalloons() {
-            const colors = ['#ff4757', '#747d8c', '#ffa502', '#2ed573', '#1e90ff'];
-            for (let i = 0; i < 15; i++) {
-                setTimeout(() => {
-                    const balloon = document.createElement('div');
-                    balloon.className = 'balloon';
-                    balloon.style.left = Math.random() * 100 + 'vw';
-                    balloon.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                    balloon.style.animationDuration = (Math.random() * 3 + 4) + 's';
-                    document.body.appendChild(balloon);
-                }, i * 300);
-            }
+        function fireConfetti() {
+            var duration = 3 * 1000;
+            var end = Date.now() + duration;
+
+            (function frame() {
+              confetti({
+                particleCount: 3,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0 },
+                colors: ['#ffffff', '#ff758c']
+              });
+              confetti({
+                particleCount: 3,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1 },
+                colors: ['#ffffff', '#ff758c']
+              });
+
+              if (Date.now() < end) {
+                requestAnimationFrame(frame);
+              }
+            }());
         }
     </script>
 </body>
