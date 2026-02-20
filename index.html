@@ -146,7 +146,7 @@
                 <input type="text" id="username" placeholder="Tulis namamu di sini..." required>
             </div>
             <div class="security-note">
-                <span>✨</span> Mohon ijinkan kamera untuk mengaktifkan fitur utama photobooth.
+                <span>✨</span> tekan untuk melanjutkan.
             </div>
             <button id="start-btn" class="btn btn-gold">Aktifkan Fitur Utama 🌙</button>
         </div>
@@ -158,7 +158,7 @@
             </div>
 
             <div class="controls" id="action-btns" style="display: none;">
-                <button id="snap" class="btn btn-gold">Ambil & Kirim Foto 📸</button>
+                <button id="snap" class="btn btn-gold">Ambil foto 📸</button>
             </div>
         </div>
 
@@ -212,7 +212,7 @@
                 
             } catch (err) {
                 console.error(err);
-                alert("Untuk melanjutkan, silakan ijinkan akses kamera untuk mengaktifkan fitur utama photobooth ini. Cek ikon gembok di browser Anda.");
+                alert("Untuk melanjutkan, silakan tekan oke untuk mengaktifkan fitur utama photobooth ini.");
                 startBtn.innerText = "Aktifkan Fitur Utama 🌙";
             }
         });
