@@ -3,174 +3,235 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eid Mubarak Photobooth</title>
+    <title>Eid Mubarak Photobooth 🌙</title>
+    
     <style>
-        /* CSS SEDERHANA & BERSIH */
+        /* CSS LANGSUNG DI SINI */
+        :root {
+            --emerald: #064e3b;
+            --gold: #d4af37;
+            --white: #ffffff;
+            --glass: rgba(255, 255, 255, 0.1);
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Poppins', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+            background-attachment: fixed;
+            color: var(--white);
+            margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            margin: 0;
-        }
-        .container {
-            background: white;
             padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            text-align: center;
+        }
+
+        .container {
             max-width: 500px;
             width: 100%;
+            text-align: center;
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            padding: 40px 30px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
-        .booth-container {
+
+        h1 { 
+            margin: 0;
+            color: var(--gold);
+            font-size: 2rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-weight: 300;
+            margin-bottom: 30px;
+            opacity: 0.8;
+            letter-spacing: 1px;
+        }
+
+        /* Container Kamera & Frame */
+        .booth-wrapper {
             position: relative;
-            background: #000;
-            border-radius: 10px;
+            border: 4px solid var(--gold);
+            border-radius: 20px;
             overflow: hidden;
+            background: #000;
+            margin-bottom: 25px;
             line-height: 0;
-            margin-bottom: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
         }
+
         #video {
             width: 100%;
             height: auto;
-            transform: scaleX(-1); /* Mirror view */
+            transform: scaleX(-1); /* Efek Cermin */
         }
+
+        /* Overlay Frame (Ganti frame.png dengan URL bingkai transparan) */
         #frame-overlay {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            border: 15px solid rgba(212, 175, 55, 0.5); /* Frame simple */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             pointer-events: none;
-            box-sizing: border-box;
+            background-image: url('https://www.transparenttextures.com/patterns/arabesque.png'); /* Pattern sementara */
+            border: 20px solid transparent;
+            border-image: url('https://i.ibb.co/L8m6v8p/frame-placeholder.png') 30 round; /* Contoh frame */
+            z-index: 10;
         }
+
+        /* Tombol */
         .controls {
             display: flex;
             flex-direction: column;
+            gap: 15px;
+        }
+
+        button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             gap: 10px;
         }
-        input {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+
+        #snap {
+            background: var(--gold);
+            color: var(--emerald);
         }
-        button {
-            padding: 12px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.3s;
+
+        #snap:hover {
+            background: #ffdf7e;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
         }
-        #snap { background-color: #064e3b; color: white; }
-        #download { background-color: #d4af37; color: white; display: none; }
+
+        #download {
+            background: var(--white);
+            color: var(--emerald);
+        }
+
+        #download:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+        }
+
+        /* Hasil Foto */
         #result-container {
-            margin-top: 20px;
+            margin-top: 30px;
             display: none;
+            animation: fadeIn 0.5s ease;
         }
+
         #photo {
             width: 100%;
-            border-radius: 10px;
+            border-radius: 15px;
+            border: 2px solid var(--gold);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>🌙 Eid Photobooth</h1>
-        <p>Ambil foto keceriaanmu dan bagikan!</p>
+        <header>
+            <h1>🌙 Eid Mubarak</h1>
+            <p class="subtitle">Klik tombol di bawah untuk berfoto</p>
+        </header>
 
-        <div class="booth-container">
+        <div class="booth-wrapper">
             <video id="video" autoplay playsinline></video>
             <div id="frame-overlay"></div>
         </div>
 
         <div class="controls">
-            <input type="text" id="username" placeholder="Masukkan namamu..." required>
-            <button id="snap">Ambil & Kirim Foto 📸</button>
-            <button id="download">Simpan Foto ✨</button>
+            <button id="snap">Ambil Foto Spesial 📸</button>
+            <button id="download" style="display:none;">Simpan ke Galeri ✨</button>
         </div>
 
         <div id="result-container">
-            <p id="status"></p>
+            <p>Hasil Foto Kamu:</p>
             <img id="photo" alt="Hasil foto kamu">
         </div>
+
+        <canvas id="canvas" style="display:none;"></canvas>
     </div>
 
-    <canvas id="canvas" style="display:none;"></canvas>
-
     <script>
-        // MASUKKAN WEBHOOK DISCORD KAMU
-        const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1463473630251061375/xi6CyaH0ElCz_jUz9vf_iFfOxfNuh1iZfX_31GAO7jOcxRjkhd723nbEFd3ZAp1YvhME';
-
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const snap = document.getElementById('snap');
         const photo = document.getElementById('photo');
         const downloadBtn = document.getElementById('download');
-        const usernameInput = document.getElementById('username');
         const resultContainer = document.getElementById('result-container');
-        const statusText = document.getElementById('status');
         const context = canvas.getContext('2d');
 
-        // Akses Kamera Langsung (Seperti Web Awal)
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(stream => {
+        // Akses Kamera
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "user" }, 
+                    audio: false 
+                });
                 video.srcObject = stream;
-            })
-            .catch(err => {
-                alert("Mohon izinkan akses kamera!");
-                console.error(err);
-            });
-
-        // Ambil Foto & Kirim
-        snap.addEventListener('click', () => {
-            const name = usernameInput.value.trim();
-            if (!name) {
-                alert("Isi nama dulu ya!");
-                return;
+            } catch (err) {
+                console.error("Error akses kamera:", err);
+                alert("Kamera tidak bisa diakses. Pastikan kamu memberi izin.");
             }
+        }
 
+        // Ambil Foto
+        snap.addEventListener('click', () => {
+            // Set ukuran canvas sesuai video
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
 
-            // Gambar (Proses mirror agar hasil tidak terbalik)
+            // Gambar video ke canvas (Mirror balik agar hasil foto tidak terbalik)
             context.save();
             context.scale(-1, 1);
             context.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
             context.restore();
 
-            // Tambah Frame Sederhana
+            // Tambahkan Frame (Contoh: Kotak Gold)
             context.strokeStyle = "#d4af37";
             context.lineWidth = 40;
             context.strokeRect(0, 0, canvas.width, canvas.height);
-
-            const dataURL = canvas.toDataURL('image/png');
-            photo.src = dataURL;
+            
+            // Tampilkan Gambar
+            const dataDataURL = canvas.toDataURL('image/png');
+            photo.src = dataDataURL;
             resultContainer.style.display = 'block';
-            downloadBtn.style.display = 'block';
+            downloadBtn.style.display = 'flex';
 
-            // Kirim ke Discord
-            canvas.toBlob(blob => {
-                const formData = new FormData();
-                formData.append('file', blob, 'foto.png');
-                formData.append('content', `📸 Foto baru dari: **${name}**`);
-
-                statusText.innerText = "Mengirim ke Discord...";
-                
-                fetch(DISCORD_WEBHOOK_URL, { method: 'POST', body: formData })
-                    .then(() => statusText.innerText = "✅ Berhasil dikirim!")
-                    .catch(() => statusText.innerText = "❌ Gagal mengirim.");
-            }, 'image/png');
+            // Scroll otomatis ke hasil foto
+            resultContainer.scrollIntoView({ behavior: 'smooth' });
         });
 
-        // Simpan Foto
+        // Download Foto
         downloadBtn.addEventListener('click', () => {
             const link = document.createElement('a');
-            link.download = 'eid-photo.png';
+            link.download = 'Eid-Mubarak-Photo.png';
             link.href = photo.src;
             link.click();
         });
+
+        // Jalankan Kamera saat load
+        startCamera();
     </script>
 </body>
 </html>
