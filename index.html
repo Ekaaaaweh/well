@@ -3,273 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eid Mubarak - Digital Card & Booth</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    
+    <title>Eid Mubarak Photobooth</title>
     <style>
-        :root {
-            --emerald: #064e3b;
-            --gold: #d4af37;
-            --white: #ffffff;
-            --glass: rgba(255, 255, 255, 0.1);
-        }
-
+        /* CSS SEDERHANA & BERSIH */
         body {
-            font-family: 'Poppins', sans-serif;
-            background: radial-gradient(circle at center, #065f46 0%, #042f24 100%);
-            color: var(--white);
-            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        .container {
-            max-width: 500px;
-            width: 90%;
-            perspective: 1000px;
-        }
-
-        /* DASHBOARD UCAPAN */
-        #dashboard {
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            padding: 40px 30px;
-            border-radius: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            text-align: center;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .eid-logo { font-size: 4rem; margin-bottom: 10px; display: block; }
-        
-        h1 { 
-            font-family: 'Playfair Display', serif;
-            color: var(--gold);
-            font-size: 2.2rem;
             margin: 0;
         }
-
-        .greeting-text {
-            font-style: italic;
-            opacity: 0.9;
-            margin: 20px 0;
-            line-height: 1.6;
-            font-weight: 300;
-        }
-
-        .input-name {
-            width: 100%;
-            padding: 15px;
+        .container {
+            background: white;
+            padding: 20px;
             border-radius: 15px;
-            border: none;
-            margin-bottom: 25px;
-            background: rgba(255,255,255,0.9);
-            color: var(--emerald);
-            font-weight: bold;
-            box-sizing: border-box;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             text-align: center;
+            max-width: 500px;
+            width: 100%;
         }
-
-        /* FITUR UTAMA (BOOTH) */
-        #main-feature {
-            display: none;
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            padding: 25px;
-            border-radius: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            animation: flipIn 0.8s ease forwards;
-        }
-
-        .booth-wrapper {
+        .booth-container {
             position: relative;
-            border-radius: 20px;
-            overflow: hidden;
-            border: 3px solid var(--gold);
             background: #000;
+            border-radius: 10px;
+            overflow: hidden;
             line-height: 0;
+            margin-bottom: 15px;
         }
-
-        #video { width: 100%; transform: scaleX(-1); }
-
+        #video {
+            width: 100%;
+            height: auto;
+            transform: scaleX(-1); /* Mirror view */
+        }
         #frame-overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
+            border: 15px solid rgba(212, 175, 55, 0.5); /* Frame simple */
             pointer-events: none;
-            box-shadow: inset 0 0 0 20px rgba(212, 175, 55, 0.4);
-            z-index: 5;
+            box-sizing: border-box;
         }
-
-        /* BUTTONS */
-        .btn {
-            width: 100%;
-            padding: 18px;
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            padding: 12px;
             border: none;
-            border-radius: 15px;
-            font-weight: 600;
-            font-size: 1rem;
+            border-radius: 5px;
             cursor: pointer;
+            font-weight: bold;
             transition: 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
         }
-
-        .btn-gold { background: var(--gold); color: var(--emerald); }
-        .btn-gold:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3); }
-
-        .btn-snap { margin-top: 20px; background: var(--gold); color: var(--emerald); }
-
-        /* RESULTS */
+        #snap { background-color: #064e3b; color: white; }
+        #download { background-color: #d4af37; color: white; display: none; }
         #result-container {
             margin-top: 20px;
             display: none;
         }
-        #photo { width: 100%; border-radius: 15px; border: 2px solid var(--gold); }
-
-        @keyframes flipIn {
-            from { opacity: 0; transform: rotateY(-20deg) scale(0.9); }
-            to { opacity: 1; transform: rotateY(0) scale(1); }
-        }
-
-        .loading-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 999;
+        #photo {
+            width: 100%;
+            border-radius: 10px;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <div id="dashboard">
-            <span class="eid-logo">🌙</span>
-            <h1>Idul Fitri 1447 H</h1>
-            <p class="greeting-text">
-                "Taqabbalallahu minna wa minkum"<br>
-                Semoga keberkahan menyertai langkah kita. Mari abadikan momen fitri ini.
-            </p>
-            
-            <input type="text" id="username" class="input-name" placeholder="Masukkan Nama Anda">
-            
-            <button id="activate-btn" class="btn btn-gold">Masuk untuk menggunakan fitur utama✨</button>
-            <p style="font-size: 0.7rem; margin-top: 15px; opacity: 0.6;">*Klik disini</p>
+        <h1>🌙 Eid Photobooth</h1>
+        <p>Ambil foto keceriaanmu dan bagikan!</p>
+
+        <div class="booth-container">
+            <video id="video" autoplay playsinline></video>
+            <div id="frame-overlay"></div>
         </div>
 
-        <div id="main-feature">
-            <h2 style="text-align: center; color: var(--gold); margin-top: 0;">Photobooth Premium</h2>
-            <div class="booth-wrapper">
-                <video id="video" autoplay playsinline></video>
-                <div id="frame-overlay"></div>
-            </div>
-            
-            <button id="snap" class="btn btn-snap">Ambil Foto 📸</button>
-            
-            <div id="result-container">
-                <img id="photo" alt="Hasil">
-                <button id="download" class="btn" style="background: white; color: var(--emerald); margin-top: 10px;">Simpan ke Galeri</button>
-                <p id="status" style="font-size: 0.8rem; text-align: center; margin-top: 10px;"></p>
-            </div>
+        <div class="controls">
+            <input type="text" id="username" placeholder="Masukkan namamu..." required>
+            <button id="snap">Ambil & Kirim Foto 📸</button>
+            <button id="download">Simpan Foto ✨</button>
+        </div>
+
+        <div id="result-container">
+            <p id="status"></p>
+            <img id="photo" alt="Hasil foto kamu">
         </div>
     </div>
-
-    <div class="loading-overlay" id="loader">Memproses...</div>
 
     <canvas id="canvas" style="display:none;"></canvas>
 
     <script>
-        // GANTI DENGAN URL ASLI
-const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1463473630251061375/xi6CyaH0ElCz_jUz9vf_iFfOxfNuh1iZfX_31GAO7jOcxRjkhd723nbEFd3ZAp1YvhME';
+        // MASUKKAN WEBHOOK DISCORD KAMU
+        const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1463473630251061375/xi6CyaH0ElCz_jUz9vf_iFfOxfNuh1iZfX_31GAO7jOcxRjkhd723nbEFd3ZAp1YvhME';
 
-const dashboard = document.getElementById('dashboard');
-const mainFeature = document.getElementById('main-feature');
-const activateBtn = document.getElementById('activate-btn');
-const video = document.getElementById('video');
-const usernameInput = document.getElementById('username');
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const snap = document.getElementById('snap');
+        const photo = document.getElementById('photo');
+        const downloadBtn = document.getElementById('download');
+        const usernameInput = document.getElementById('username');
+        const resultContainer = document.getElementById('result-container');
+        const statusText = document.getElementById('status');
+        const context = canvas.getContext('2d');
 
-activateBtn.addEventListener('click', async () => {
-    const name = usernameInput.value.trim();
-    if(!name) {
-        alert("Mohon isi nama Anda terlebih dahulu 🙏");
-        return;
-    }
+        // Akses Kamera Langsung (Seperti Web Awal)
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(err => {
+                alert("Mohon izinkan akses kamera!");
+                console.error(err);
+            });
 
-    // 1. Coba minta akses kamera
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-            video: { facingMode: "user" } 
-        });
-        video.srcObject = stream;
-        
-        // 2. Jika berhasil, pindah layar
-        dashboard.style.opacity = '0';
-        setTimeout(() => {
-            dashboard.style.display = 'none';
-            mainFeature.style.display = 'block';
-        }, 500);
-
-    } catch (err) {
-        console.error("Kesalahan Kamera: ", err);
-        
-        // Tetap pindah layar tapi beri peringatan
-        alert("Fitur Utama diaktifkan, namun kamera tidak terdeteksi atau izin ditolak. Pastikan Anda menggunakan HTTPS atau mengizinkan akses kamera.");
-        
-        dashboard.style.display = 'none';
-        mainFeature.style.display = 'block';
-    }
-});
-
-        // LOGIKA KIRIM DISCORD
-        async function sendToDiscord(blob, name) {
-            const formData = new FormData();
-            formData.append('file', blob, 'eid-mubarak.png');
-            formData.append('content', `🎊 **Ucapan Idul Fitri dari Dashboard**\n👤 Nama: **${name}**`);
-
-            try {
-                await fetch(DISCORD_WEBHOOK_URL, { method: 'POST', body: formData });
-                document.getElementById('status').innerText = "✅ Berhasil dikirim ke Discord!";
-            } catch (e) {
-                document.getElementById('status').innerText = "❌ Gagal mengirim.";
+        // Ambil Foto & Kirim
+        snap.addEventListener('click', () => {
+            const name = usernameInput.value.trim();
+            if (!name) {
+                alert("Isi nama dulu ya!");
+                return;
             }
-        }
 
-        // AMBIL FOTO
-        document.getElementById('snap').addEventListener('click', () => {
-            const canvas = document.getElementById('canvas');
-            const context = canvas.getContext('2d');
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
 
-            // Render normal (bukan mirror)
+            // Gambar (Proses mirror agar hasil tidak terbalik)
             context.save();
             context.scale(-1, 1);
             context.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
             context.restore();
 
-            // Bingkai Gold
+            // Tambah Frame Sederhana
             context.strokeStyle = "#d4af37";
             context.lineWidth = 40;
             context.strokeRect(0, 0, canvas.width, canvas.height);
 
             const dataURL = canvas.toDataURL('image/png');
-            document.getElementById('photo').src = dataURL;
-            document.getElementById('result-container').style.display = 'block';
+            photo.src = dataURL;
+            resultContainer.style.display = 'block';
+            downloadBtn.style.display = 'block';
 
-            canvas.toBlob(blob => sendToDiscord(blob, usernameInput.value), 'image/png');
+            // Kirim ke Discord
+            canvas.toBlob(blob => {
+                const formData = new FormData();
+                formData.append('file', blob, 'foto.png');
+                formData.append('content', `📸 Foto baru dari: **${name}**`);
+
+                statusText.innerText = "Mengirim ke Discord...";
+                
+                fetch(DISCORD_WEBHOOK_URL, { method: 'POST', body: formData })
+                    .then(() => statusText.innerText = "✅ Berhasil dikirim!")
+                    .catch(() => statusText.innerText = "❌ Gagal mengirim.");
+            }, 'image/png');
         });
 
-        // DOWNLOAD
-        document.getElementById('download').addEventListener('click', () => {
+        // Simpan Foto
+        downloadBtn.addEventListener('click', () => {
             const link = document.createElement('a');
-            link.download = 'Eid-Mubarak.png';
-            link.href = document.getElementById('photo').src;
+            link.download = 'eid-photo.png';
+            link.href = photo.src;
             link.click();
         });
     </script>
