@@ -1,32 +1,27 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eid Mubarak Photobooth</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class="container">
-        <h1>🌙 Selamat Hari Raya Idul Fitri</h1>
-        <p>Ambil foto keceriaanmu dan bagikan!</p>
+<div class="container">
+    <header>
+        <h1>🌙 Selamat Hari Raya</h1>
+        <h2>Idul Fitri 1447 H</h2>
+        <p>Abadikan momen kemenanganmu dengan bingkai spesial!</p>
+    </header>
 
+    <div class="booth-outer">
         <div class="booth-container">
             <video id="video" autoplay playsinline></video>
             <div id="frame-overlay"></div>
-            <canvas id="canvas" style="display:none;"></canvas>
-        </div>
-
-        <div class="controls">
-            <button id="snap">Ambil Foto 📸</button>
-            <button id="download" style="display:none;">Simpan Foto ✨</button>
-        </div>
-
-        <div id="result-container">
-            <img id="photo" alt="Hasil foto kamu">
         </div>
     </div>
 
-    <script src="script.js"></script>
-</body>
-</html>
+    <div class="controls">
+        <button id="snap" class="btn-primary">Ambil Foto 📸</button>
+        <button id="download" class="btn-secondary" style="display:none;">Simpan Foto ✨</button>
+    </div>
+
+    <div id="result-container" style="display:none;">
+        <h3>Hasil Foto Kamu:</h3>
+        <img id="photo" alt="Hasil foto kamu">
+        <p>Klik tombol "Simpan" di atas untuk mengunduh</p>
+    </div>
+    
+    <canvas id="canvas" style="display:none;"></canvas>
+</div>
